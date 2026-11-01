@@ -2,10 +2,26 @@ import axios from 'axios';
 
 const getBaseURL = () => {
   const envUrl = import.meta.env.VITE_API_BASE_URL;
-  if (envUrl) {
+  if (envUrl && envUrl !== '/api') {
     return envUrl.endsWith('/api') ? envUrl : `${envUrl.replace(/\/$/, '')}/api`;
   }
-  return '/api';
+
+  if (typeof window !== 'undefined') {
+    // 1. Allow runtime configuration via localStorage (e.g. if Render service URL differs)
+    const customUrl = localStorage.getItem('sevasetu_api_url');
+    if (customUrl) {
+      return customUrl.endsWith('/api') ? customUrl : `${customUrl.replace(/\/$/, '')}/api`;
+    }
+
+    // 2. On local dev, use relative /api (proxied by Vite to 127.0.0.1:5000)
+    const hostname = window.location.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return '/api';
+    }
+  }
+
+  // 3. In deployed production without explicit env variable, route to Render backend service
+  return 'https://sevasetu-backend.onrender.com/api';
 };
 
 const api = axios.create({
