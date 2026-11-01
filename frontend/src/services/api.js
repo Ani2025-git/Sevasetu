@@ -21,7 +21,7 @@ const getBaseURL = () => {
   }
 
   // 3. In deployed production without explicit env variable, route to Render backend service
-  return 'https://sevasetu-backend.onrender.com/api';
+  return 'https://sevasetu-mb4e.onrender.com/api';
 };
 
 const api = axios.create({
