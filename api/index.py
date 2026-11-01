@@ -28,3 +28,4 @@ with app.app_context():
 
 # Vercel WSGI entry point
 # Exports 'app' for @vercel/python
+

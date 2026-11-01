@@ -12,6 +12,7 @@ backend/instance/
 # Node
 frontend/node_modules/
 frontend/dist/
+dist/
 frontend/.npm-cache/
 .npm-cache/
 *.log
