@@ -20,7 +20,9 @@ import {
   ChevronRight,
   Info,
   HelpCircle,
-  Sparkles
+  Sparkles,
+  Smartphone,
+  Award
 } from 'lucide-react';
 import { publicService } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -49,7 +51,8 @@ const ServiceDetailsPage = () => {
         setLoading(true);
         const res = await publicService.getService(id);
         if (res.data.success) {
-          setService(res.data.service);
+          const s = res.data.service;
+          setService(s);
 
           // Restore checklist progress from localStorage
           const storageKey = `sevasetu_checklist_${id}`;
@@ -58,6 +61,27 @@ const ServiceDetailsPage = () => {
             if (savedProgress) {
               setCheckedDocs(JSON.parse(savedProgress));
             }
+          } catch {
+            // ignore
+          }
+
+          // Record in recently viewed services in localStorage
+          try {
+            const recentKey = 'sevasetu_recently_viewed';
+            const recentStr = localStorage.getItem(recentKey);
+            let recentList = recentStr ? JSON.parse(recentStr) : [];
+            // Remove existing duplicate
+            recentList = recentList.filter((item) => item.id !== s.id);
+            // Prepend current
+            recentList.unshift({
+              id: s.id,
+              name: s.name,
+              category: s.category,
+              department: s.department,
+              viewedAt: new Date().toISOString(),
+            });
+            // Keep top 6
+            localStorage.setItem(recentKey, JSON.stringify(recentList.slice(0, 6)));
           } catch {
             // ignore
           }
@@ -114,9 +138,9 @@ const ServiceDetailsPage = () => {
   const copyChecklistToClipboard = () => {
     if (!service || !service.required_documents) return;
     const text = service.required_documents
-      .map((doc, idx) => `[${checkedDocs[idx] ? 'X' : ' '}] ${doc}`)
+      .map((doc, idx) => `[${checkedDocs[idx] ? '✓' : ' '}] ${doc}`)
       .join('\n');
-    navigator.clipboard.writeText(`${service.name} — Required Documents Checklist:\n\n${text}`);
+    navigator.clipboard.writeText(`${service.name} — Required Documents Checklist (Seva Setu):\n\n${text}`);
     setCopiedChecklist(true);
     setTimeout(() => setCopiedChecklist(false), 2000);
   };
@@ -141,10 +165,10 @@ const ServiceDetailsPage = () => {
 
   if (loading) {
     return (
-      <div className="max-w-5xl mx-auto px-4 py-12">
+      <div className="max-w-6xl mx-auto px-4 py-12">
         <div className="space-y-6 animate-pulse">
-          <div className="h-6 w-32 bg-slate-200 rounded" />
-          <div className="h-32 bg-slate-200 rounded-3xl" />
+          <div className="h-6 w-32 bg-slate-200 rounded-lg" />
+          <div className="h-44 bg-slate-200 rounded-3xl" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="md:col-span-2 h-96 bg-slate-200 rounded-2xl" />
             <div className="h-96 bg-slate-200 rounded-2xl" />
@@ -162,7 +186,7 @@ const ServiceDetailsPage = () => {
         <p className="text-sm text-slate-600">{error || 'The requested service does not exist.'}</p>
         <Link
           to="/services"
-          className="inline-flex items-center gap-2 bg-navy-900 text-white text-xs font-semibold px-4 py-2 rounded-xl"
+          className="inline-flex items-center gap-2 bg-navy-950 text-white text-xs font-semibold px-4 py-2.5 rounded-xl"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Directory
@@ -189,7 +213,7 @@ const ServiceDetailsPage = () => {
 
         <button
           onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-1 text-slate-500 hover:text-slate-900"
+          className="inline-flex items-center gap-1 text-slate-500 hover:text-slate-900 font-medium"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           Back
@@ -197,20 +221,20 @@ const ServiceDetailsPage = () => {
       </div>
 
       {/* Hero Header Card */}
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
+      <div className="bg-white rounded-3xl border border-slate-200/90 shadow-sm p-6 sm:p-8 space-y-6">
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
           <div className="space-y-3 max-w-3xl">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+              <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200/70">
                 {service.category || 'Certificate'}
               </span>
-              <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/70">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                 {service.verification_status || 'Verified State Guideline'}
               </span>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
               {service.name}
             </h1>
 
@@ -219,7 +243,7 @@ const ServiceDetailsPage = () => {
               <span className="font-medium text-slate-700">{service.department || 'Government of West Bengal'}</span>
             </div>
 
-            <p className="text-sm text-slate-600 leading-relaxed pt-1">
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed pt-1">
               {service.description}
             </p>
           </div>
@@ -252,7 +276,7 @@ const ServiceDetailsPage = () => {
 
         {/* Quick Highlights Bar */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-slate-100">
-          <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+          <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
             <div className="text-[11px] font-medium text-slate-500 flex items-center gap-1 mb-1">
               <Clock className="w-3.5 h-3.5 text-blue-600" />
               Expected Timeline
@@ -262,17 +286,17 @@ const ServiceDetailsPage = () => {
             </div>
           </div>
 
-          <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+          <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
             <div className="text-[11px] font-medium text-slate-500 flex items-center gap-1 mb-1">
               <IndianRupee className="w-3.5 h-3.5 text-emerald-600" />
               Application Fee
             </div>
-            <div className="text-xs sm:text-sm font-bold text-slate-800">
+            <div className="text-xs sm:text-sm font-bold text-emerald-700">
               {service.fees || 'Free'}
             </div>
           </div>
 
-          <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+          <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
             <div className="text-[11px] font-medium text-slate-500 flex items-center gap-1 mb-1">
               <FileText className="w-3.5 h-3.5 text-indigo-600" />
               Mandatory Proofs
@@ -282,9 +306,9 @@ const ServiceDetailsPage = () => {
             </div>
           </div>
 
-          <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+          <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
             <div className="text-[11px] font-medium text-slate-500 flex items-center gap-1 mb-1">
-              <MapPin className="w-3.5 h-3.5 text-purple-600" />
+              <MapPin className="w-3.5 h-3.5 text-teal-600" />
               BSK Assistance
             </div>
             <div className="text-xs sm:text-sm font-bold text-slate-800">
@@ -300,19 +324,19 @@ const ServiceDetailsPage = () => {
         <div className="lg:col-span-2 space-y-6">
           {/* Eligibility Section */}
           {service.eligibility && (
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-3">
+            <div className="bg-white rounded-3xl border border-slate-200/90 p-6 space-y-3">
               <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-blue-600" />
                 Eligibility Criteria
               </h2>
-              <div className="text-xs sm:text-sm text-slate-600 leading-relaxed bg-blue-50/40 p-4 rounded-xl border border-blue-100">
+              <div className="text-xs sm:text-sm text-slate-700 leading-relaxed bg-blue-50/40 p-4 rounded-2xl border border-blue-100">
                 {service.eligibility}
               </div>
             </div>
           )}
 
           {/* Online Application Guide */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4">
+          <div className="bg-white rounded-3xl border border-slate-200/90 p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-blue-600" />
@@ -321,14 +345,14 @@ const ServiceDetailsPage = () => {
               {service.online_apply_url && (
                 <button
                   onClick={() => setIsRedirectModalOpen(true)}
-                  className="text-xs font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                  className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1"
                 >
                   Official Link <ExternalLink className="w-3 h-3" />
                 </button>
               )}
             </div>
 
-            <div className="text-xs sm:text-sm text-slate-700 leading-relaxed space-y-2 whitespace-pre-line bg-slate-50 p-4 rounded-xl border border-slate-100">
+            <div className="text-xs sm:text-sm text-slate-700 leading-relaxed space-y-2 whitespace-pre-line bg-slate-50 p-4 rounded-2xl border border-slate-100">
               {service.application_process ||
                 '1. Prepare your scanned documents according to the checklist.\n2. Visit the official West Bengal portal.\n3. Register with your mobile number and email ID.\n4. Fill in the online form and upload required certificates.\n5. Save your Application Acknowledgment Number for tracking.'}
             </div>
@@ -337,7 +361,7 @@ const ServiceDetailsPage = () => {
               <div className="pt-2">
                 <button
                   onClick={() => setIsRedirectModalOpen(true)}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-navy-900 hover:bg-navy-800 text-white text-xs font-semibold px-5 py-3 rounded-xl transition-colors shadow-sm"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-navy-950 hover:bg-navy-900 text-white text-xs font-semibold px-5 py-3 rounded-xl transition-colors shadow-sm"
                 >
                   <span>Proceed to Official Application Portal</span>
                   <ExternalLink className="w-4 h-4" />
@@ -347,13 +371,13 @@ const ServiceDetailsPage = () => {
           </div>
 
           {/* Offline Application / BSK Help */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4">
+          <div className="bg-white rounded-3xl border border-slate-200/90 p-6 space-y-4">
             <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
               <Building2 className="w-5 h-5 text-slate-700" />
               Offline Application & Bangla Sahayata Kendra (BSK)
             </h2>
 
-            <div className="text-xs sm:text-sm text-slate-700 leading-relaxed space-y-2 whitespace-pre-line bg-slate-50 p-4 rounded-xl border border-slate-100">
+            <div className="text-xs sm:text-sm text-slate-700 leading-relaxed space-y-2 whitespace-pre-line bg-slate-50 p-4 rounded-2xl border border-slate-100">
               {service.offline_instructions ||
                 'If you prefer applying in person or do not have computer/internet access:\n\n1. Carry physical copies of all required documents.\n2. Visit your nearest Bangla Sahayata Kendra (BSK) or Block Development Office (BDO) / SDO Office.\n3. The BSK Data Entry Operator will submit your digital application free of government service charge.\n4. Collect your printed physical receipt.'}
             </div>
@@ -370,7 +394,7 @@ const ServiceDetailsPage = () => {
           </div>
 
           {/* Privacy & Safety Notice */}
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 space-y-2">
+          <div className="bg-amber-50/70 border border-amber-200 rounded-3xl p-5 space-y-2">
             <div className="flex items-center gap-2 text-xs font-bold text-amber-900">
               <AlertCircle className="w-4 h-4 text-amber-700 shrink-0" />
               Independent Citizen Safety Notice
@@ -383,7 +407,7 @@ const ServiceDetailsPage = () => {
 
         {/* Right Column: Interactive Document Checklist */}
         <div className="space-y-6">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-5 sticky top-24">
+          <div className="bg-white rounded-3xl border border-slate-200/90 shadow-sm p-6 space-y-5 sticky top-24">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
@@ -414,10 +438,10 @@ const ServiceDetailsPage = () => {
             </div>
 
             {/* Checklist Progress Bar */}
-            <div className="space-y-1.5 bg-slate-50 p-3.5 rounded-xl border border-slate-100">
+            <div className="space-y-1.5 bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
               <div className="flex items-center justify-between text-xs font-semibold">
                 <span className="text-slate-700">Preparation Progress</span>
-                <span className={progressPercent === 100 ? 'text-emerald-600' : 'text-blue-600'}>
+                <span className={progressPercent === 100 ? 'text-emerald-600 font-bold' : 'text-blue-600 font-bold'}>
                   {progressPercent}% ({completedCount}/{docs.length})
                 </span>
               </div>
@@ -445,7 +469,7 @@ const ServiceDetailsPage = () => {
                   <div
                     key={idx}
                     onClick={() => toggleDoc(idx)}
-                    className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer select-none transition-all ${
+                    className={`flex items-start gap-3 p-3 rounded-2xl border cursor-pointer select-none transition-all ${
                       isChecked
                         ? 'bg-emerald-50/70 border-emerald-200 text-slate-800'
                         : 'bg-white border-slate-200 hover:border-slate-300 text-slate-700'
@@ -460,7 +484,7 @@ const ServiceDetailsPage = () => {
                     </div>
                     <span
                       className={`text-xs leading-relaxed ${
-                        isChecked ? 'line-through text-slate-500' : 'font-medium'
+                        isChecked ? 'line-through text-slate-500 font-normal' : 'font-semibold'
                       }`}
                     >
                       {doc}
@@ -483,7 +507,7 @@ const ServiceDetailsPage = () => {
             )}
 
             {/* Quick tips */}
-            <div className="bg-blue-50/70 rounded-xl p-3 border border-blue-100 text-[11px] text-slate-600 space-y-1">
+            <div className="bg-blue-50/70 rounded-2xl p-3.5 border border-blue-100 text-[11px] text-slate-600 space-y-1">
               <div className="font-semibold text-blue-900 flex items-center gap-1">
                 <Info className="w-3.5 h-3.5 text-blue-600" />
                 Helpful Verification Tip
@@ -509,4 +533,3 @@ const ServiceDetailsPage = () => {
 };
 
 export default ServiceDetailsPage;
-
