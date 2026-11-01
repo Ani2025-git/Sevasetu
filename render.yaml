@@ -20,4 +20,6 @@ services:
         value: "false"
       - key: STALE_THRESHOLD_MINUTES
         value: "30"
+      - key: DATABASE_URL
+        sync: false
 
