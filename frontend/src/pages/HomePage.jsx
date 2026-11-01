@@ -39,36 +39,42 @@ import { publicService } from '../services/api';
 import ExternalRedirectModal from '../components/ExternalRedirectModal';
 
 // Hero background slideshow slides covering Indian public assistance themes
+// Optimized local images in public/assets/hero/ with fallback URLs
 const HERO_SLIDES = [
   {
     id: 1,
-    url: 'https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=1920&q=80',
-    alt: 'Citizens receiving assistance at a digital service centre',
-    theme: 'Digital Service Assistance'
+    url: '/assets/hero/hero-1.jpg',
+    fallbackUrl: 'https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=1920&q=80',
+    alt: 'Indian citizens using digital government service centres',
+    theme: 'Digital Citizen Assistance Centre'
   },
   {
     id: 2,
-    url: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1920&q=80',
-    alt: 'Modern public service help desk',
+    url: '/assets/hero/hero-2.jpg',
+    fallbackUrl: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1920&q=80',
+    alt: 'Citizens receiving assistance at a public service help desk',
     theme: 'Public Service Help Desk'
   },
   {
     id: 3,
-    url: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1920&q=80',
-    alt: 'Rural citizens accessing digital services and guidance',
-    theme: 'Rural Digital Inclusion'
+    url: '/assets/hero/hero-3.jpg',
+    fallbackUrl: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1920&q=80',
+    alt: 'Rural people accessing digital services on computers',
+    theme: 'Rural Digital Inclusion & Guidance'
   },
   {
     id: 4,
-    url: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1920&q=80',
-    alt: 'People using computers at a citizen facilitation centre',
+    url: '/assets/hero/hero-4.jpg',
+    fallbackUrl: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1920&q=80',
+    alt: 'Modern citizen facilitation centre workstations',
     theme: 'Citizen Facilitation Centre'
   },
   {
     id: 5,
-    url: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1920&q=80',
-    alt: 'Professional community assistance environment',
-    theme: 'Community Assistance Environment'
+    url: '/assets/hero/hero-5.jpg',
+    fallbackUrl: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1920&q=80',
+    alt: 'Digital India-inspired public service environment',
+    theme: 'Digital Public Service Environment'
   }
 ];
 
@@ -98,6 +104,16 @@ const HomePage = ({ onOpenObservationModal }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isHeroHovered, setIsHeroHovered] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [slideImages, setSlideImages] = useState(() => 
+    HERO_SLIDES.reduce((acc, slide) => ({ ...acc, [slide.id]: slide.url }), {})
+  );
+
+  const handleImageError = (slideId, fallbackUrl) => {
+    setSlideImages((prev) => ({
+      ...prev,
+      [slideId]: fallbackUrl
+    }));
+  };
 
   // Queue notify state
   const [notifyEmail, setNotifyEmail] = useState('');
@@ -173,8 +189,23 @@ const HomePage = ({ onOpenObservationModal }) => {
     HERO_SLIDES.forEach((slide) => {
       const img = new Image();
       img.src = slide.url;
+      img.onerror = () => {
+        handleImageError(slide.id, slide.fallbackUrl);
+        const fallbackImg = new Image();
+        fallbackImg.src = slide.fallbackUrl;
+      };
     });
   }, []);
+
+  // Preload next upcoming slide image dynamically
+  useEffect(() => {
+    const nextIdx = (currentSlide + 1) % HERO_SLIDES.length;
+    const nextSlide = HERO_SLIDES[nextIdx];
+    if (nextSlide) {
+      const nextImg = new Image();
+      nextImg.src = slideImages[nextSlide.id] || nextSlide.url;
+    }
+  }, [currentSlide, slideImages]);
 
   // Automatic Hero background rotation every 6 seconds; pauses when hovered
   useEffect(() => {
@@ -275,55 +306,68 @@ const HomePage = ({ onOpenObservationModal }) => {
         onMouseLeave={() => setIsHeroHovered(false)}
         aria-label="Welcome and Service Search Banner"
       >
-        {/* Automatic Background Slideshow with Smooth Crossfade & Subtle Zoom */}
+        {/* Automatic Background Slideshow with Smooth Crossfade & Subtle Zoom (Max 1.04) */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
           {HERO_SLIDES.map((slide, idx) => {
             const isActive = idx === currentSlide;
+            const imgSrc = slideImages[slide.id] || slide.url;
             return (
               <div 
                 key={slide.id}
                 className={`absolute inset-0 bg-cover bg-center transition-all duration-[1200ms] ease-in-out ${
                   isActive 
-                    ? `opacity-100 ${prefersReducedMotion ? 'scale-100' : 'scale-105 duration-[6000ms] ease-out'}` 
+                    ? `opacity-100 ${prefersReducedMotion ? 'scale-100' : 'scale-[1.04] duration-[6000ms] ease-out'}` 
                     : 'opacity-0 scale-100 duration-[1200ms]'
                 }`}
                 style={{
-                  backgroundImage: `url('${slide.url}')`,
+                  backgroundImage: `url('${imgSrc}')`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center'
                 }}
-              />
+              >
+                {/* Hidden img tag to catch 404 and trigger fallback */}
+                <img 
+                  src={imgSrc} 
+                  alt="" 
+                  className="hidden" 
+                  onError={() => handleImageError(slide.id, slide.fallbackUrl)} 
+                />
+              </div>
             );
           })}
         </div>
 
-        {/* Dark Transparent Overlay for Crisp Text Readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-navy-950/90 via-navy-900/85 to-navy-950/95 backdrop-blur-[2px]" />
+        {/* 1. Main Base Overlay: Dark Navy with ~38-40% opacity (no blur, crisp & clearly visible photographs) */}
+        <div className="absolute inset-0 bg-navy-950/40 pointer-events-none" />
+
+        {/* 2. Subtle Navy Edge Gradients: Soft framing from left, right, top and bottom while keeping center bright & recognizable */}
+        <div className="absolute inset-0 bg-gradient-to-t from-navy-950/85 via-transparent to-navy-950/40 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-navy-950/45 via-transparent to-navy-950/45 pointer-events-none" />
 
         <div className="relative z-10 max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8 pt-20 pb-24 sm:pb-28 space-y-6">
           {/* Civic Micro-Tag */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-slate-200 text-xs font-semibold tracking-wide backdrop-blur-sm">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-navy-950/60 border border-white/20 text-slate-100 text-xs font-semibold tracking-wide backdrop-blur-xs shadow-md">
             <span className="w-2 h-2 rounded-full bg-saffron" />
             <span>Digital Citizen Services Guide • West Bengal</span>
           </div>
 
-          {/* Exact Required Large Heading */}
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
+          {/* Exact Required Large Heading with crisp readable shadow */}
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]">
             Welcome to <span className="text-saffron">Seva Setu</span>
           </h1>
 
-          {/* Subtitle */}
-          <p className="text-base sm:text-xl text-slate-200 font-medium tracking-tight">
+          {/* Subtitle with readable drop-shadow */}
+          <p className="text-base sm:text-xl text-white font-medium tracking-tight drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">
             Connecting Citizens with Government Services
           </p>
 
-          <p className="max-w-2xl mx-auto text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
+          <p className="max-w-2xl mx-auto text-xs sm:text-sm text-slate-100 leading-relaxed font-normal drop-shadow-[0_1px_3px_rgba(0,0,0,0.75)]">
             An independent platform to discover public services, verify required document checklists, and navigate official West Bengal portals without intermediaries.
           </p>
 
           {/* Large Centered Search Bar */}
           <div className="pt-2 max-w-2xl mx-auto">
-            <form onSubmit={handleHeroSearch} className="relative shadow-lg rounded-xl overflow-hidden bg-white border border-slate-300 focus-within:border-digital transition-all">
+            <form onSubmit={handleHeroSearch} className="relative shadow-2xl rounded-xl overflow-hidden bg-white border border-slate-300 focus-within:border-digital transition-all">
               <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
@@ -342,8 +386,8 @@ const HomePage = ({ onOpenObservationModal }) => {
             </form>
 
             {/* Exact Required Search Suggestions */}
-            <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-slate-300 mt-3.5">
-              <span className="text-slate-400 font-medium">Suggestions:</span>
+            <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-slate-100 mt-3.5">
+              <span className="text-slate-200 font-medium drop-shadow-xs">Suggestions:</span>
               {[
                 { label: 'Income Certificate', query: 'Income' },
                 { label: 'Caste Certificate', query: 'Caste' },
@@ -354,7 +398,7 @@ const HomePage = ({ onOpenObservationModal }) => {
                   key={item.label}
                   type="button"
                   onClick={() => navigate(`/services?search=${encodeURIComponent(item.query)}`)}
-                  className="px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-slate-100 hover:text-white transition-colors border border-white/20 text-[11px]"
+                  className="px-2.5 py-1 rounded bg-navy-950/60 hover:bg-navy-950/80 text-white transition-colors border border-white/25 text-[11px] font-medium shadow-sm"
                 >
                   {item.label}
                 </button>
@@ -369,10 +413,10 @@ const HomePage = ({ onOpenObservationModal }) => {
                   type="button"
                   onClick={() => setCurrentSlide(idx)}
                   aria-label={`Slide ${idx + 1}: ${slide.theme}`}
-                  className={`transition-all duration-300 rounded-full ${
+                  className={`transition-all duration-300 rounded-full shadow-sm ${
                     idx === currentSlide
                       ? 'w-6 h-1.5 bg-saffron'
-                      : 'w-1.5 h-1.5 bg-white/30 hover:bg-white/60'
+                      : 'w-1.5 h-1.5 bg-white/40 hover:bg-white/80'
                   }`}
                 />
               ))}
