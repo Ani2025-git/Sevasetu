@@ -18,10 +18,11 @@ app = create_app()
 # Auto-seed database on serverless cold start if needed without dropping user records
 with app.app_context():
     try:
+        from app.models.centre import Centre
         db.create_all()
         from seed import ensure_demo_users, seed_database
         ensure_demo_users()
-        if not User.query.filter_by(email="admin@sevasetu.org").first():
+        if Centre.query.count() == 0:
             seed_database(drop_existing=False)
             print("Auto-seeded database in serverless environment.")
     except Exception as e:

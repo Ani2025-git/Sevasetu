@@ -28,11 +28,11 @@ backend_app_pkg.app = app
 with app.app_context():
     try:
         from app.models import db
-        from app.models.user import User
+        from app.models.centre import Centre
         db.create_all()
         from seed import ensure_demo_users, seed_database
         ensure_demo_users()
-        if not User.query.filter_by(email="admin@sevasetu.org").first():
+        if Centre.query.count() == 0:
             seed_database(drop_existing=False)
             print("Auto-seeded default records for Seva Setu deployment.")
     except Exception as e:

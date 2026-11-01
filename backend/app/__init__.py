@@ -33,7 +33,12 @@ def create_app(config_class=Config):
 
     @app.errorhandler(500)
     def internal_error(e):
-        return jsonify({'success': False, 'message': 'An internal server error occurred'}), 500
+        error_detail = str(getattr(e, 'original_exception', e))
+        return jsonify({
+            'success': False,
+            'message': 'An internal server error occurred',
+            'detail': error_detail
+        }), 500
 
     return app
 
