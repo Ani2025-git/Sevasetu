@@ -38,43 +38,28 @@ import {
 import { publicService } from '../services/api';
 import ExternalRedirectModal from '../components/ExternalRedirectModal';
 
-// Hero background slideshow slides covering Indian public assistance themes
-// Optimized local images in public/assets/hero/ with fallback URLs
+// Hero background slideshow slides using user-uploaded citizen service illustrations & imagery
 const HERO_SLIDES = [
   {
     id: 1,
-    url: '/assets/hero/hero-1.jpg',
-    fallbackUrl: 'https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=1920&q=80',
-    alt: 'Indian citizens using digital government service centres',
-    theme: 'Digital Citizen Assistance Centre'
+    url: '/assets/hero/citizen-service.png',
+    fallbackUrl: '/assets/hero/hero-1.jpg',
+    alt: 'Citizen service centre assistance and digital facilitation',
+    theme: 'Citizen Service Assistance'
   },
   {
     id: 2,
-    url: '/assets/hero/hero-2.jpg',
-    fallbackUrl: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1920&q=80',
-    alt: 'Citizens receiving assistance at a public service help desk',
-    theme: 'Public Service Help Desk'
+    url: '/assets/hero/digital-services.png',
+    fallbackUrl: '/assets/hero/hero-4.jpg',
+    alt: 'Digital citizen services and online application portal',
+    theme: 'Digital Citizen Services'
   },
   {
     id: 3,
-    url: '/assets/hero/hero-3.jpg',
-    fallbackUrl: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1920&q=80',
-    alt: 'Rural people accessing digital services on computers',
-    theme: 'Rural Digital Inclusion & Guidance'
-  },
-  {
-    id: 4,
-    url: '/assets/hero/hero-4.jpg',
-    fallbackUrl: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1920&q=80',
-    alt: 'Modern citizen facilitation centre workstations',
-    theme: 'Citizen Facilitation Centre'
-  },
-  {
-    id: 5,
-    url: '/assets/hero/hero-5.jpg',
-    fallbackUrl: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1920&q=80',
-    alt: 'Digital India-inspired public service environment',
-    theme: 'Digital Public Service Environment'
+    url: '/assets/hero/citizen-guidance.png',
+    fallbackUrl: '/assets/hero/hero-2.jpg',
+    alt: 'Citizen service document checklist and guidance',
+    theme: 'Citizen Service Guidance'
   }
 ];
 
@@ -306,7 +291,7 @@ const HomePage = ({ onOpenObservationModal }) => {
         onMouseLeave={() => setIsHeroHovered(false)}
         aria-label="Welcome and Service Search Banner"
       >
-        {/* Automatic Background Slideshow with Smooth Crossfade & Subtle Zoom (Max 1.04) */}
+        {/* Automatic Background Slideshow with Smooth Crossfade & Subtle Zoom */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
           {HERO_SLIDES.map((slide, idx) => {
             const isActive = idx === currentSlide;
@@ -316,7 +301,7 @@ const HomePage = ({ onOpenObservationModal }) => {
                 key={slide.id}
                 className={`absolute inset-0 bg-cover bg-center transition-all duration-[1200ms] ease-in-out ${
                   isActive 
-                    ? `opacity-100 ${prefersReducedMotion ? 'scale-100' : 'scale-[1.04] duration-[6000ms] ease-out'}` 
+                    ? `opacity-100 ${prefersReducedMotion ? 'scale-100' : 'scale-[1.03] duration-[6000ms] ease-out'}` 
                     : 'opacity-0 scale-100 duration-[1200ms]'
                 }`}
                 style={{
@@ -337,12 +322,12 @@ const HomePage = ({ onOpenObservationModal }) => {
           })}
         </div>
 
-        {/* 1. Main Base Overlay: Dark Navy with ~38-40% opacity (no blur, crisp & clearly visible photographs) */}
-        <div className="absolute inset-0 bg-navy-950/40 pointer-events-none" />
+        {/* 1. Main Base Navy Overlay: 25-35% opacity (clear central visibility, no heavy filter, no blur) */}
+        <div className="absolute inset-0 bg-navy-950/30 pointer-events-none" />
 
-        {/* 2. Subtle Navy Edge Gradients: Soft framing from left, right, top and bottom while keeping center bright & recognizable */}
-        <div className="absolute inset-0 bg-gradient-to-t from-navy-950/85 via-transparent to-navy-950/40 pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-r from-navy-950/45 via-transparent to-navy-950/45 pointer-events-none" />
+        {/* 2. Subtle Blue Gradient Framing: 15-20% additional opacity near the edges only */}
+        <div className="absolute inset-0 bg-gradient-to-t from-navy-950/20 via-transparent to-navy-950/15 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-navy-950/20 via-transparent to-navy-950/20 pointer-events-none" />
 
         <div className="relative z-10 max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8 pt-20 pb-24 sm:pb-28 space-y-6">
           {/* Civic Micro-Tag */}
