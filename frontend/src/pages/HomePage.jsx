@@ -38,6 +38,40 @@ import {
 import { publicService } from '../services/api';
 import ExternalRedirectModal from '../components/ExternalRedirectModal';
 
+// Hero background slideshow slides covering Indian public assistance themes
+const HERO_SLIDES = [
+  {
+    id: 1,
+    url: 'https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=1920&q=80',
+    alt: 'Citizens receiving assistance at a digital service centre',
+    theme: 'Digital Service Assistance'
+  },
+  {
+    id: 2,
+    url: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1920&q=80',
+    alt: 'Modern public service help desk',
+    theme: 'Public Service Help Desk'
+  },
+  {
+    id: 3,
+    url: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1920&q=80',
+    alt: 'Rural citizens accessing digital services and guidance',
+    theme: 'Rural Digital Inclusion'
+  },
+  {
+    id: 4,
+    url: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1920&q=80',
+    alt: 'People using computers at a citizen facilitation centre',
+    theme: 'Citizen Facilitation Centre'
+  },
+  {
+    id: 5,
+    url: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1920&q=80',
+    alt: 'Professional community assistance environment',
+    theme: 'Community Assistance Environment'
+  }
+];
+
 const HomePage = ({ onOpenObservationModal }) => {
   const navigate = useNavigate();
   const [services, setServices] = useState([]);
@@ -59,6 +93,11 @@ const HomePage = ({ onOpenObservationModal }) => {
   // 5. Service Category Tabs State
   const [selectedTab, setSelectedTab] = useState('Citizen Services');
   const [leftSearchQuery, setLeftSearchQuery] = useState('');
+
+  // Hero Background Slideshow State
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isHeroHovered, setIsHeroHovered] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   // Queue notify state
   const [notifyEmail, setNotifyEmail] = useState('');
@@ -113,6 +152,38 @@ const HomePage = ({ onOpenObservationModal }) => {
   const nextTicker = () => {
     setCurrentTickerIdx((prev) => (prev + 1) % announcements.length);
   };
+
+  // Detect prefers-reduced-motion for smooth accessibility
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+    const listener = (e) => setPrefersReducedMotion(e.matches);
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', listener);
+      return () => mediaQuery.removeEventListener('change', listener);
+    } else if (mediaQuery.addListener) {
+      mediaQuery.addListener(listener);
+      return () => mediaQuery.removeListener(listener);
+    }
+  }, []);
+
+  // Preload Hero Slideshow Images to eliminate flickering or blank screens
+  useEffect(() => {
+    HERO_SLIDES.forEach((slide) => {
+      const img = new Image();
+      img.src = slide.url;
+    });
+  }, []);
+
+  // Automatic Hero background rotation every 6 seconds; pauses when hovered
+  useEffect(() => {
+    if (isHeroHovered) return;
+    const slideTimer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+    }, 6000);
+    return () => clearInterval(slideTimer);
+  }, [isHeroHovered]);
 
   const handleHeroSearch = (e) => {
     e.preventDefault();
@@ -197,15 +268,34 @@ const HomePage = ({ onOpenObservationModal }) => {
 
   return (
     <div className="space-y-16 pb-16">
-      {/* 2. FULL-WIDTH PHOTOGRAPHIC HERO SECTION */}
-      <section className="relative overflow-hidden -mx-4 sm:-mx-6 lg:-mx-8 -mt-2 sm:-mt-3">
-        {/* Photographic Background with High-Quality Civic Architecture */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?auto=format&fit=crop&w=1920&q=80')`
-          }}
-        />
+      {/* 2. FULL-WIDTH PHOTOGRAPHIC HERO SECTION WITH AUTOMATIC SLIDESHOW */}
+      <section 
+        className="relative overflow-hidden -mx-4 sm:-mx-6 lg:-mx-8 -mt-2 sm:-mt-3 bg-navy-950"
+        onMouseEnter={() => setIsHeroHovered(true)}
+        onMouseLeave={() => setIsHeroHovered(false)}
+        aria-label="Welcome and Service Search Banner"
+      >
+        {/* Automatic Background Slideshow with Smooth Crossfade & Subtle Zoom */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+          {HERO_SLIDES.map((slide, idx) => {
+            const isActive = idx === currentSlide;
+            return (
+              <div 
+                key={slide.id}
+                className={`absolute inset-0 bg-cover bg-center transition-all duration-[1200ms] ease-in-out ${
+                  isActive 
+                    ? `opacity-100 ${prefersReducedMotion ? 'scale-100' : 'scale-105 duration-[6000ms] ease-out'}` 
+                    : 'opacity-0 scale-100 duration-[1200ms]'
+                }`}
+                style={{
+                  backgroundImage: `url('${slide.url}')`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center'
+                }}
+              />
+            );
+          })}
+        </div>
 
         {/* Dark Transparent Overlay for Crisp Text Readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-navy-950/90 via-navy-900/85 to-navy-950/95 backdrop-blur-[2px]" />
@@ -268,6 +358,23 @@ const HomePage = ({ onOpenObservationModal }) => {
                 >
                   {item.label}
                 </button>
+              ))}
+            </div>
+
+            {/* Subtle Slideshow Indicator Dots */}
+            <div className="pt-4 flex items-center justify-center gap-1.5" aria-label="Slideshow slide indicators">
+              {HERO_SLIDES.map((slide, idx) => (
+                <button
+                  key={slide.id}
+                  type="button"
+                  onClick={() => setCurrentSlide(idx)}
+                  aria-label={`Slide ${idx + 1}: ${slide.theme}`}
+                  className={`transition-all duration-300 rounded-full ${
+                    idx === currentSlide
+                      ? 'w-6 h-1.5 bg-saffron'
+                      : 'w-1.5 h-1.5 bg-white/30 hover:bg-white/60'
+                  }`}
+                />
               ))}
             </div>
           </div>
