@@ -13,6 +13,7 @@ import {
   Calendar,
   ExternalLink,
   ChevronRight,
+  ChevronLeft,
   Layers,
   Sparkles,
   Compass,
@@ -28,7 +29,11 @@ import {
   Bell,
   Smartphone,
   Eye,
-  Check
+  Check,
+  ArrowUpRight,
+  Briefcase,
+  Wrench,
+  Gift
 } from 'lucide-react';
 import { publicService } from '../services/api';
 import ExternalRedirectModal from '../components/ExternalRedirectModal';
@@ -41,6 +46,19 @@ const HomePage = ({ onOpenObservationModal }) => {
   const [selectedDistrict, setSelectedDistrict] = useState('All');
   const [districts, setDistricts] = useState(['All']);
   const [loading, setLoading] = useState(true);
+
+  // 3. What's New Ticker State
+  const announcements = [
+    { id: 1, text: 'WB e-District 2.0 digital verification guidelines updated for 2026 applications.', link: '/services' },
+    { id: 2, text: 'Bangla Sahayata Kendra (BSK) operators assist citizens free of charge across all districts.', link: '/centre' },
+    { id: 3, text: 'Oasis Caste Certificate portal checklist: Blood relation proof and Gram Panchayat certificate verified.', link: '/services' },
+    { id: 4, text: 'Janma-Mrityu Tathya civil registration portal guidelines updated for hospital & home births.', link: '/services' },
+  ];
+  const [currentTickerIdx, setCurrentTickerIdx] = useState(0);
+
+  // 5. Service Category Tabs State
+  const [selectedTab, setSelectedTab] = useState('Citizen Services');
+  const [leftSearchQuery, setLeftSearchQuery] = useState('');
 
   // Queue notify state
   const [notifyEmail, setNotifyEmail] = useState('');
@@ -80,6 +98,22 @@ const HomePage = ({ onOpenObservationModal }) => {
     loadHomeData();
   }, []);
 
+  // Auto-rotate What's New Ticker every 5 seconds
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTickerIdx((prev) => (prev + 1) % announcements.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [announcements.length]);
+
+  const prevTicker = () => {
+    setCurrentTickerIdx((prev) => (prev - 1 + announcements.length) % announcements.length);
+  };
+
+  const nextTicker = () => {
+    setCurrentTickerIdx((prev) => (prev + 1) % announcements.length);
+  };
+
   const handleHeroSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -111,493 +145,622 @@ const HomePage = ({ onOpenObservationModal }) => {
     return selectedDistrict === 'All' || c.district === selectedDistrict;
   });
 
-  const categories = [
-    {
-      title: 'Revenue & Income',
-      desc: 'Income Certificate, Residential Proof, Character Certificate',
-      count: '3 Services',
-      icon: <FileText className="w-5 h-5 text-digital" />,
-      tag: 'Income',
-      borderColor: 'border-digital-200',
-      badgeColor: 'bg-digital-50 text-digital',
-    },
-    {
-      title: 'Social & Caste',
-      desc: 'SC / ST / OBC Certificate, Caste Validation, Tribe Status',
-      count: '4 Services',
-      icon: <Award className="w-5 h-5 text-saffron" />,
-      tag: 'Caste',
-      borderColor: 'border-saffron-200',
-      badgeColor: 'bg-saffron-50 text-saffron-800',
-    },
-    {
-      title: 'Civil & Vital Records',
-      desc: 'Birth Registration, Death Certificate, Domicile Proof',
-      count: '3 Services',
-      icon: <FileCheck className="w-5 h-5 text-indiaGreen" />,
-      tag: 'Birth',
-      borderColor: 'border-indiaGreen-200',
-      badgeColor: 'bg-indiaGreen-50 text-indiaGreen-800',
-    },
-    {
-      title: 'Food & Ration Supplies',
-      desc: 'Digital Ration Card, Member Addition, NFSA / RKSY',
-      count: '2 Services',
-      icon: <Layers className="w-5 h-5 text-navy" />,
-      tag: 'Ration',
-      borderColor: 'border-navy-200',
-      badgeColor: 'bg-navy-50 text-navy',
-    },
-  ];
+  // Real statistics derived from backend records
+  const totalServicesCount = services.length;
+  const certificateServicesCount = services.filter(s => 
+    s.name.toLowerCase().includes('certificate') || 
+    (s.category && s.category.toLowerCase().includes('certificate'))
+  ).length;
+  const totalCentresCount = centres.length;
+  const updatedGuidesCount = services.filter(s => s.required_documents && s.required_documents.length > 0).length;
+
+  // Filter services by category tab
+  const getTabServices = () => {
+    switch (selectedTab) {
+      case 'Citizen Services':
+        return services.filter(s => 
+          s.name.toLowerCase().includes('income') || 
+          s.name.toLowerCase().includes('caste') || 
+          s.name.toLowerCase().includes('residence') ||
+          s.name.toLowerCase().includes('birth') ||
+          s.name.toLowerCase().includes('death')
+        );
+      case 'Business Services':
+        return services.filter(s => 
+          s.category?.toLowerCase().includes('revenue') || 
+          s.name.toLowerCase().includes('income') ||
+          s.name.toLowerCase().includes('residence')
+        );
+      case 'Utility Services':
+        return services.filter(s => 
+          s.name.toLowerCase().includes('ration') || 
+          s.category?.toLowerCase().includes('food')
+        );
+      case 'Government Schemes':
+        return services.filter(s => 
+          s.name.toLowerCase().includes('caste') || 
+          s.name.toLowerCase().includes('ration')
+        );
+      default:
+        return services;
+    }
+  };
+
+  const tabServices = getTabServices().length > 0 ? getTabServices() : services;
+
+  // Searchable services in Left Side of Section 6
+  const leftServices = services.filter(s => {
+    if (!leftSearchQuery.trim()) return true;
+    const q = leftSearchQuery.toLowerCase();
+    return s.name.toLowerCase().includes(q) || (s.department && s.department.toLowerCase().includes(q));
+  });
 
   return (
-    <div className="space-y-20 pb-16">
-      {/* 2. HERO SECTION */}
-      <section className="bg-navy text-white pt-14 pb-20 px-4 sm:px-6 lg:px-8 -mx-4 sm:-mx-6 lg:-mx-8 border-b border-navy-700">
-        <div className="max-w-4xl mx-auto text-center space-y-6">
-          {/* Subtle Civic Badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-saffron-100 text-xs font-semibold tracking-wide">
+    <div className="space-y-16 pb-16">
+      {/* 2. FULL-WIDTH PHOTOGRAPHIC HERO SECTION */}
+      <section className="relative overflow-hidden -mx-4 sm:-mx-6 lg:-mx-8 -mt-2 sm:-mt-3">
+        {/* Photographic Background with High-Quality Civic Architecture */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: `url('https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?auto=format&fit=crop&w=1920&q=80')`
+          }}
+        />
+
+        {/* Dark Transparent Overlay for Crisp Text Readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-navy-950/90 via-navy-900/85 to-navy-950/95 backdrop-blur-[2px]" />
+
+        <div className="relative z-10 max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8 pt-20 pb-24 sm:pb-28 space-y-6">
+          {/* Civic Micro-Tag */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-slate-200 text-xs font-semibold tracking-wide backdrop-blur-sm">
             <span className="w-2 h-2 rounded-full bg-saffron" />
-            <span>Digital Citizen Assistance • West Bengal Public Services</span>
+            <span>Digital Citizen Services Guide • West Bengal</span>
           </div>
 
-          {/* Exact Required Heading */}
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
-            Your Government Services, <br className="hidden sm:inline" />
-            <span className="text-saffron">Made Simple.</span>
+          {/* Exact Required Large Heading */}
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
+            Welcome to <span className="text-saffron">Seva Setu</span>
           </h1>
 
-          <p className="max-w-2xl mx-auto text-xs sm:text-sm md:text-base text-slate-200 leading-relaxed font-normal">
-            Discover verified certificate guidelines, prepare your document checklist, and access official West Bengal application portals without intermediaries.
-          </p>
-          <p className="text-xs text-saffron-200 font-medium">
-            আপনার সরকারি পরিষেবা, এখন আরও সহজ ও সুরক্ষিত।
+          {/* Subtitle */}
+          <p className="text-base sm:text-xl text-slate-200 font-medium tracking-tight">
+            Connecting Citizens with Government Services
           </p>
 
-          {/* 3. LARGE SERVICE SEARCH BAR WITH SUGGESTIONS */}
+          <p className="max-w-2xl mx-auto text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
+            An independent platform to discover public services, verify required document checklists, and navigate official West Bengal portals without intermediaries.
+          </p>
+
+          {/* Large Centered Search Bar */}
           <div className="pt-2 max-w-2xl mx-auto">
-            <form onSubmit={handleHeroSearch} className="relative shadow-sm rounded-xl overflow-hidden bg-white border border-slate-300 focus-within:border-digital transition-all">
+            <form onSubmit={handleHeroSearch} className="relative shadow-lg rounded-xl overflow-hidden bg-white border border-slate-300 focus-within:border-digital transition-all">
               <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
-                placeholder="Search Income, Caste, Residence, Birth, Ration Card..."
+                placeholder="Search Income Certificate, Caste Certificate, Residence Certificate..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-28 sm:pr-36 py-3.5 sm:py-4 bg-white text-slate-900 placeholder-slate-400 text-sm font-medium focus:outline-none"
+                className="w-full pl-12 pr-28 sm:pr-36 py-4 bg-white text-navy placeholder-slate-400 text-sm sm:text-base font-medium focus:outline-none"
               />
               <button
                 type="submit"
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 px-4 sm:px-6 py-2.5 bg-digital hover:bg-digital-600 text-white font-bold text-xs sm:text-sm rounded-lg transition-colors flex items-center gap-1.5"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 px-4 sm:px-6 py-2.5 bg-digital hover:bg-digital-600 text-white font-bold text-xs sm:text-sm rounded-lg transition-colors flex items-center gap-1.5 shadow-xs"
               >
                 <span>Search</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </form>
 
-            {/* Quick Search Suggestions */}
-            <div className="flex flex-wrap items-center justify-center gap-1.5 text-xs text-slate-300 mt-3">
+            {/* Exact Required Search Suggestions */}
+            <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-slate-300 mt-3.5">
               <span className="text-slate-400 font-medium">Suggestions:</span>
               {[
                 { label: 'Income Certificate', query: 'Income' },
-                { label: 'Caste (SC/ST/OBC)', query: 'Caste' },
-                { label: 'Residence / Domicile', query: 'Residence' },
+                { label: 'Caste Certificate', query: 'Caste' },
+                { label: 'Residence Certificate', query: 'Residence' },
                 { label: 'Birth Certificate', query: 'Birth' },
-                { label: 'Ration Card', query: 'Ration' },
               ].map((item) => (
                 <button
                   key={item.label}
                   type="button"
                   onClick={() => navigate(`/services?search=${encodeURIComponent(item.query)}`)}
-                  className="px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-slate-100 hover:text-white transition-colors border border-white/15 text-[11px]"
+                  className="px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-slate-100 hover:text-white transition-colors border border-white/20 text-[11px]"
                 >
                   {item.label}
                 </button>
               ))}
             </div>
           </div>
+        </div>
+      </section>
 
-          {/* Digital Trust Metrics */}
-          <div className="pt-6 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl mx-auto border-t border-navy-700/70">
-            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-              <div className="text-xl font-black text-saffron">3,500+</div>
-              <div className="text-[11px] text-slate-300 mt-0.5">BSK Centres in WB</div>
-            </div>
-            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-              <div className="text-xl font-black text-indiaGreen">₹0 Fee</div>
-              <div className="text-[11px] text-slate-300 mt-0.5">Free BSK Operator Service</div>
-            </div>
-            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-              <div className="text-xl font-black text-digital-200">100%</div>
-              <div className="text-[11px] text-slate-300 mt-0.5">Verified Guidelines</div>
-            </div>
-            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-              <div className="text-xl font-black text-white">0 Middlemen</div>
-              <div className="text-[11px] text-slate-300 mt-0.5">Direct State Portals</div>
-            </div>
+      {/* 3. WHAT'S NEW TICKER (Horizontal Announcement Bar) */}
+      <section className="-mt-8 relative z-20 max-w-6xl mx-auto px-4 sm:px-6">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col sm:flex-row items-center justify-between text-xs">
+          {/* Label */}
+          <div className="bg-saffron text-navy font-black px-4 py-3 flex items-center gap-2 shrink-0 uppercase tracking-wider w-full sm:w-auto justify-center sm:justify-start">
+            <Bell className="w-4 h-4" />
+            <span>What's New</span>
+          </div>
+
+          {/* Rotating Text */}
+          <div className="flex-1 px-4 py-2.5 sm:py-0 overflow-hidden flex items-center justify-between w-full">
+            <p className="text-slate-700 truncate font-medium">
+              {announcements[currentTickerIdx].text}
+            </p>
+            <Link
+              to={announcements[currentTickerIdx].link}
+              className="text-digital font-bold hover:underline shrink-0 ml-3 text-[11px]"
+            >
+              View More
+            </Link>
+          </div>
+
+          {/* Controls */}
+          <div className="flex items-center gap-1 px-3 py-2 sm:py-0 border-t sm:border-t-0 sm:border-l border-slate-200 shrink-0">
+            <button
+              onClick={prevTicker}
+              className="p-1 rounded hover:bg-slate-100 text-slate-600 transition-colors"
+              title="Previous Announcement"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <span className="text-[11px] text-slate-400 font-mono px-1">
+              {currentTickerIdx + 1}/{announcements.length}
+            </span>
+            <button
+              onClick={nextTicker}
+              className="p-1 rounded hover:bg-slate-100 text-slate-600 transition-colors"
+              title="Next Announcement"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </section>
 
-      {/* 5. BROWSE BY SERVICE CATEGORIES */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
-          <div>
-            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-digital uppercase tracking-wider mb-1">
-              <Compass className="w-3.5 h-3.5" />
-              <span>Public Service Directory</span>
+      {/* 4. STATISTICS SECTION (Real Counts From Backend) */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-1">
+            <div className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+              <FileText className="w-4 h-4 text-digital" />
+              Available Services
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-navy tracking-tight">
-              Browse by Service Categories
-            </h2>
+            <div className="text-2xl sm:text-3xl font-black text-navy">
+              {loading ? '...' : totalServicesCount}
+            </div>
+            <p className="text-[11px] text-slate-500">Government Services Listed</p>
           </div>
+
+          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-1">
+            <div className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+              <Award className="w-4 h-4 text-saffron" />
+              Certificate Services
+            </div>
+            <div className="text-2xl sm:text-3xl font-black text-navy">
+              {loading ? '...' : certificateServicesCount}
+            </div>
+            <p className="text-[11px] text-slate-500">Public Certificates Verified</p>
+          </div>
+
+          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-1">
+            <div className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+              <Building2 className="w-4 h-4 text-indiaGreen" />
+              BSK Centres
+            </div>
+            <div className="text-2xl sm:text-3xl font-black text-navy">
+              {loading ? '...' : totalCentresCount}
+            </div>
+            <p className="text-[11px] text-slate-500">Verified Pilot Centres in WB</p>
+          </div>
+
+          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-1">
+            <div className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+              <CheckCircle2 className="w-4 h-4 text-digital" />
+              Service Guides
+            </div>
+            <div className="text-2xl sm:text-3xl font-black text-navy">
+              {loading ? '...' : updatedGuidesCount}
+            </div>
+            <p className="text-[11px] text-slate-500">Document Checklists Ready</p>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. SERVICE CATEGORY TABS */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+          <div className="flex items-center gap-2 overflow-x-auto">
+            {[
+              { id: 'Citizen Services', icon: <Users className="w-4 h-4" /> },
+              { id: 'Business Services', icon: <Briefcase className="w-4 h-4" /> },
+              { id: 'Utility Services', icon: <Wrench className="w-4 h-4" /> },
+              { id: 'Government Schemes', icon: <Gift className="w-4 h-4" /> },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setSelectedTab(tab.id)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-bold whitespace-nowrap transition-colors ${
+                  selectedTab === tab.id
+                    ? 'bg-navy text-white shadow-xs'
+                    : 'text-slate-600 hover:text-navy hover:bg-slate-100'
+                }`}
+              >
+                {tab.icon}
+                <span>{tab.id}</span>
+              </button>
+            ))}
+          </div>
+
           <Link
             to="/services"
-            className="text-xs font-bold text-digital hover:text-navy flex items-center gap-1 hover:underline"
+            className="text-xs font-bold text-digital hover:text-navy hidden sm:flex items-center gap-1"
           >
-            <span>View All Public Services</span>
-            <ChevronRight className="w-4 h-4" />
+            All Services <ChevronRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {categories.map((cat, idx) => (
+        {/* Tabbed Service Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {tabServices.slice(0, 6).map((service) => (
             <div
-              key={idx}
-              onClick={() => navigate(`/services?search=${cat.tag}`)}
-              className="bg-white p-6 rounded-xl border border-slate-200 hover:border-digital hover:shadow-sm transition-all cursor-pointer group flex flex-col justify-between space-y-4"
+              key={service.id}
+              className="bg-white p-5 rounded-xl border border-slate-200 hover:border-digital hover:shadow-sm transition-all flex flex-col justify-between space-y-3"
             >
-              <div className="space-y-3">
-                <div className="w-10 h-10 rounded-lg bg-surface border border-slate-200 flex items-center justify-center">
-                  {cat.icon}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-digital-50 text-digital border border-digital-200">
+                    {service.category || 'Certificate'}
+                  </span>
+                  <span className="text-[11px] font-semibold text-indiaGreen bg-indiaGreen-50 px-2 py-0.5 rounded border border-indiaGreen-200">
+                    {service.fees || 'Free'}
+                  </span>
                 </div>
-                <div>
-                  <h3 className="font-bold text-base text-navy group-hover:text-digital transition-colors">
-                    {cat.title}
-                  </h3>
-                  <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                    {cat.desc}
-                  </p>
-                </div>
+
+                <Link
+                  to={`/services/${service.id}`}
+                  className="font-bold text-base text-navy hover:text-digital transition-colors block line-clamp-1"
+                >
+                  {service.name}
+                </Link>
+
+                <p className="text-xs text-slate-500 line-clamp-1">
+                  {service.department || 'Government of West Bengal'}
+                </p>
+
+                <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
+                  {service.description}
+                </p>
               </div>
 
-              <div className="flex items-center justify-between text-xs pt-3 border-t border-slate-100 text-slate-500">
-                <span className="font-semibold text-slate-700">{cat.count}</span>
-                <span className="text-digital font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                  Explore <ChevronRight className="w-3 h-3" />
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                <span className="text-slate-500">
+                  {service.required_documents?.length || 0} Docs Required
                 </span>
+                <Link
+                  to={`/services/${service.id}`}
+                  className="font-bold text-digital hover:text-navy flex items-center gap-1"
+                >
+                  View Guide <ChevronRight className="w-3.5 h-3.5" />
+                </Link>
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* 4. POPULAR CERTIFICATE SERVICE CARDS */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
-          <div>
-            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-saffron uppercase tracking-wider mb-1">
-              <Zap className="w-3.5 h-3.5" />
-              <span>Frequent Citizen Applications</span>
+      {/* 6. MAIN CONTENT SECTION (Two-Column Reference Layout) */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-white rounded-xl border border-slate-200 p-6 sm:p-8 shadow-xs">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            {/* LEFT SIDE: Category Navigation & Searchable Service List */}
+            <div className="lg:col-span-5 space-y-4">
+              <div>
+                <h3 className="text-base font-bold text-navy flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-digital" />
+                  Government Services List
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Search or select a public service to view requirements
+                </p>
+              </div>
+
+              {/* Mini search input */}
+              <div className="relative">
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Filter service list..."
+                  value={leftSearchQuery}
+                  onChange={(e) => setLeftSearchQuery(e.target.value)}
+                  className="w-full pl-9 pr-3 py-2 rounded-lg border border-slate-300 text-xs focus:outline-none focus:border-digital bg-surface"
+                />
+              </div>
+
+              {/* Scrollable list of services */}
+              <div className="space-y-2 max-h-[380px] overflow-y-auto pr-1">
+                {leftServices.map((s) => (
+                  <Link
+                    key={s.id}
+                    to={`/services/${s.id}`}
+                    className="p-3 rounded-lg border border-slate-200 hover:border-digital hover:bg-digital-50/30 transition-all flex items-center justify-between group"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-8 h-8 rounded-lg bg-surface flex items-center justify-center text-digital shrink-0 group-hover:bg-digital group-hover:text-white transition-colors">
+                        <FileCheck className="w-4 h-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-bold text-xs text-navy group-hover:text-digital transition-colors truncate">
+                          {s.name}
+                        </p>
+                        <p className="text-[10px] text-slate-500 truncate">
+                          {s.department || 'West Bengal'}
+                        </p>
+                      </div>
+                    </div>
+                    <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-digital shrink-0" />
+                  </Link>
+                ))}
+              </div>
+
+              <div className="text-center pt-2">
+                <Link
+                  to="/services"
+                  className="text-xs font-bold text-digital hover:underline"
+                >
+                  View Complete Public Services Directory →
+                </Link>
+              </div>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-navy tracking-tight">
-              Popular Certificate Services
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-600 mt-1">
-              Verified document requirements and direct links to West Bengal government portals.
-            </p>
-          </div>
-          <Link
-            to="/services"
-            className="inline-flex items-center gap-1.5 text-xs font-bold px-3.5 py-2 rounded-lg bg-white border border-slate-300 text-navy hover:bg-slate-50 transition-colors shrink-0"
-          >
-            <span>Full Directory ({services.length})</span>
-            <ChevronRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
 
-        {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-64 bg-slate-100 rounded-xl animate-pulse" />
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {services.slice(0, 6).map((service) => (
-              <div
-                key={service.id}
-                className="bg-white rounded-xl border border-slate-200 hover:border-digital hover:shadow-sm transition-all flex flex-col justify-between overflow-hidden"
-              >
-                <div className="p-6 space-y-3.5">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-[11px] font-semibold tracking-wide uppercase px-2.5 py-0.5 rounded bg-digital-50 text-digital border border-digital-200">
-                      {service.category || 'Certificate'}
-                    </span>
-                    <span className="inline-flex items-center gap-1 text-[11px] font-medium text-indiaGreen bg-indiaGreen-50 px-2 py-0.5 rounded border border-indiaGreen-200">
-                      <ShieldCheck className="w-3 h-3 text-indiaGreen" />
-                      Verified
-                    </span>
+            {/* RIGHT SIDE: Reference Inspired Editorial Box */}
+            <div className="lg:col-span-7 bg-surface rounded-xl p-6 sm:p-8 border border-slate-200 space-y-5">
+              <div className="space-y-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-saffron">
+                  Citizen Empowerment
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-navy tracking-tight leading-tight">
+                  Empowering Citizens with Government Services.
+                </h2>
+              </div>
+
+              <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                <strong>Seva Setu</strong> is designed to remove the complexity of dealing with administrative procedures. We empower every citizen of West Bengal with clear documentation checklists, verified timelines, and direct links to official government portals.
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                <div className="p-3 bg-white rounded-lg border border-slate-200 space-y-1">
+                  <div className="text-xs font-bold text-navy flex items-center gap-1.5">
+                    <CheckSquare className="w-4 h-4 text-digital" />
+                    Document Guide
                   </div>
-
-                  <div>
-                    <Link
-                      to={`/services/${service.id}`}
-                      className="text-lg font-bold text-navy hover:text-digital transition-colors line-clamp-1"
-                    >
-                      {service.name}
-                    </Link>
-                    <p className="text-xs text-slate-500 mt-1 line-clamp-1">
-                      {service.department || 'Government of West Bengal'}
-                    </p>
-                  </div>
-
-                  <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
-                    {service.description}
+                  <p className="text-[11px] text-slate-600">
+                    Pre-verify identity, residence, and income proof to prevent counter rejections.
                   </p>
-
-                  <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-slate-100">
-                    <div className="bg-surface p-2 rounded-lg border border-slate-100">
-                      <span className="text-[10px] text-slate-500 block">Processing Days</span>
-                      <span className="font-bold text-navy">{service.expected_processing_time || '7 - 15 Days'}</span>
-                    </div>
-                    <div className="bg-surface p-2 rounded-lg border border-slate-100">
-                      <span className="text-[10px] text-slate-500 block">Official Fee</span>
-                      <span className="font-bold text-indiaGreen">{service.fees || 'Free'}</span>
-                    </div>
-                  </div>
-
-                  {service.required_documents && (
-                    <div className="text-xs text-slate-700 flex items-center justify-between bg-digital-50/50 p-2.5 rounded-lg border border-digital-100">
-                      <span className="font-semibold text-navy">Checklist:</span>
-                      <span className="text-digital font-bold">{service.required_documents.length} Required Documents</span>
-                    </div>
-                  )}
                 </div>
 
-                <div className="p-4 bg-surface border-t border-slate-200 flex items-center gap-2">
-                  <Link
-                    to={`/services/${service.id}`}
-                    className="flex-1 inline-flex items-center justify-center gap-1.5 bg-navy hover:bg-navy-900 text-white text-xs font-semibold py-2.5 px-3 rounded-lg transition-colors"
-                  >
-                    <span>Document Checklist</span>
-                    <ChevronRight className="w-3.5 h-3.5" />
-                  </Link>
+                <div className="p-3 bg-white rounded-lg border border-slate-200 space-y-1">
+                  <div className="text-xs font-bold text-navy flex items-center gap-1.5">
+                    <Smartphone className="w-4 h-4 text-saffron" />
+                    Online Apply
+                  </div>
+                  <p className="text-[11px] text-slate-600">
+                    Direct safe redirection to official West Bengal portals without intermediaries.
+                  </p>
+                </div>
 
-                  {service.online_apply_url && (
-                    <button
-                      onClick={(e) => handleApplyClick(service, e)}
-                      className="inline-flex items-center justify-center gap-1 bg-white hover:bg-slate-50 text-digital border border-digital-300 text-xs font-semibold py-2.5 px-3 rounded-lg transition-colors"
-                      title="Apply on Official Portal"
-                    >
-                      <span>Apply</span>
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </button>
-                  )}
+                <div className="p-3 bg-white rounded-lg border border-slate-200 space-y-1">
+                  <div className="text-xs font-bold text-navy flex items-center gap-1.5">
+                    <Building2 className="w-4 h-4 text-indiaGreen" />
+                    BSK Help
+                  </div>
+                  <p className="text-[11px] text-slate-600">
+                    Find nearest Bangla Sahayata Kendra counters for free operator assistance.
+                  </p>
                 </div>
               </div>
-            ))}
+
+              <div className="pt-4 border-t border-slate-200 flex flex-wrap items-center gap-3">
+                <Link
+                  to="/services"
+                  className="inline-flex items-center gap-2 bg-navy hover:bg-navy-900 text-white font-bold text-xs px-5 py-2.5 rounded-lg transition-colors shadow-xs"
+                >
+                  <span>Explore All Services</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+                <Link
+                  to="/centre"
+                  className="inline-flex items-center gap-2 bg-white hover:bg-slate-50 text-navy border border-slate-300 font-semibold text-xs px-4 py-2.5 rounded-lg transition-colors"
+                >
+                  <MapPin className="w-4 h-4 text-saffron" />
+                  <span>Locate BSK Centres</span>
+                </Link>
+              </div>
+            </div>
           </div>
-        )}
+        </div>
       </section>
 
-      {/* 6. HOW IT WORKS: SEARCH → CHECK DOCUMENTS → APPLY */}
+      {/* 7A. HOW SEVA SETU WORKS */}
       <section className="bg-white py-14 px-4 sm:px-6 lg:px-8 -mx-4 sm:-mx-6 lg:-mx-8 border-y border-slate-200">
-        <div className="max-w-7xl mx-auto space-y-10">
-          <div className="text-center max-w-2xl mx-auto space-y-2">
+        <div className="max-w-6xl mx-auto space-y-8">
+          <div className="text-center max-w-2xl mx-auto space-y-1">
             <span className="text-xs font-bold uppercase tracking-wider text-digital">
-              Simple 3-Step Citizen Workflow
+              Simple 3-Step Process
             </span>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-navy tracking-tight">
-              How It Works: Search → Check Documents → Apply
+              How Seva Setu Works
             </h2>
             <p className="text-xs sm:text-sm text-slate-600">
-              Prepare correctly before submitting online or visiting the Bangla Sahayata Kendra counter.
+              Prepare before you visit to guarantee hassle-free service delivery.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-surface p-6 rounded-xl border border-slate-200 space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-lg bg-digital text-white flex items-center justify-center font-bold">
-                  1
-                </div>
-                <Search className="w-5 h-5 text-digital" />
+              <div className="w-10 h-10 rounded-lg bg-digital text-white flex items-center justify-center font-bold text-base">
+                1
               </div>
-              <h3 className="font-bold text-base text-navy">Step 1: Search Service</h3>
+              <h3 className="font-bold text-base text-navy">Search & Select Service</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Find your required West Bengal certificate or public scheme in our verified directory. Review published department fees and turnaround times.
+                Search your required certificate (Income, Caste, Residence, Birth) or browse public services by department.
               </p>
             </div>
 
             <div className="bg-surface p-6 rounded-xl border border-slate-200 space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-lg bg-saffron text-navy font-bold">
-                  2
-                </div>
-                <CheckSquare className="w-5 h-5 text-saffron" />
+              <div className="w-10 h-10 rounded-lg bg-saffron text-navy font-bold text-base">
+                2
               </div>
-              <h3 className="font-bold text-base text-navy">Step 2: Check Documents</h3>
+              <h3 className="font-bold text-base text-navy">Review Document Checklist</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Tick off identity proofs, address documents, photos, and affidavits on our interactive checklist. Never face application rejection due to missing paperwork.
+                Tick off identity, address, and income proofs on our interactive checklist. Save your progress on your device.
               </p>
             </div>
 
             <div className="bg-surface p-6 rounded-xl border border-slate-200 space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-lg bg-indiaGreen text-white font-bold">
-                  3
-                </div>
-                <Building2 className="w-5 h-5 text-indiaGreen" />
+              <div className="w-10 h-10 rounded-lg bg-indiaGreen text-white font-bold text-base">
+                3
               </div>
-              <h3 className="font-bold text-base text-navy">Step 3: Apply Online or at BSK</h3>
+              <h3 className="font-bold text-base text-navy">Apply Directly Online or at BSK</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Click directly through to official government portals (e.g. e-District 2.0) or visit your nearest Bangla Sahayata Kendra for free operator assistance.
+                Click safely through to official state portals or walk into any Bangla Sahayata Kendra for free operator submission.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 7. REQUIRED DOCUMENTS INFORMATION SECTION */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        <div className="bg-navy text-white rounded-2xl p-8 sm:p-10 border border-navy-700 space-y-6">
+      {/* 7B. REQUIRED DOCUMENTS GUIDE */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-navy text-white rounded-xl p-8 sm:p-10 border border-navy-700 space-y-6">
           <div className="max-w-2xl space-y-2">
             <span className="text-xs font-bold uppercase tracking-wider text-saffron">
-              Document Preparation Guide
+              Required Documents Guide
             </span>
             <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-              The 4 Standard Pillars of Citizen Documentation
+              The 4 Standard Documentation Pillars
             </h2>
-            <p className="text-xs sm:text-sm text-slate-300">
-              Ensure you possess valid digital or physical formats of these four categories before starting any application:
+            <p className="text-xs sm:text-sm text-slate-200">
+              Prepare digital and physical copies of these four categories before starting any certificate application:
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
-            <div className="p-4 rounded-xl bg-white/10 border border-white/15 space-y-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="p-4 rounded-lg bg-white/10 border border-white/15 space-y-1.5">
               <div className="text-saffron font-bold text-xs uppercase flex items-center gap-1.5">
-                <Check className="w-4 h-4 text-saffron" /> Proof of Identity (POI)
+                <Check className="w-4 h-4 text-saffron" /> Proof of Identity
               </div>
               <p className="text-xs text-slate-200 leading-relaxed">
-                Aadhaar Card, Voter Identity Card (EPIC), Passport, or PAN Card.
+                Aadhaar Card, Voter Card (EPIC), Passport, or PAN Card.
               </p>
             </div>
 
-            <div className="p-4 rounded-xl bg-white/10 border border-white/15 space-y-2">
+            <div className="p-4 rounded-lg bg-white/10 border border-white/15 space-y-1.5">
               <div className="text-digital-200 font-bold text-xs uppercase flex items-center gap-1.5">
-                <Check className="w-4 h-4 text-digital-200" /> Proof of Residence (POR)
+                <Check className="w-4 h-4 text-digital-200" /> Proof of Residence
               </div>
               <p className="text-xs text-slate-200 leading-relaxed">
-                Electricity Bill, Land Deed (Parcha), Ration Card, or Gram Panchayat Certificate.
+                Electricity Bill, Land Deed (Parcha), Ration Card, or Panchayat Certificate.
               </p>
             </div>
 
-            <div className="p-4 rounded-xl bg-white/10 border border-white/15 space-y-2">
+            <div className="p-4 rounded-lg bg-white/10 border border-white/15 space-y-1.5">
               <div className="text-indiaGreen font-bold text-xs uppercase flex items-center gap-1.5">
-                <Check className="w-4 h-4 text-indiaGreen" /> Income & Category Proof
+                <Check className="w-4 h-4 text-indiaGreen" /> Category / Income Proof
               </div>
               <p className="text-xs text-slate-200 leading-relaxed">
-                Salary Slip, BDO / SDO Income Certificate, or Caste Certificate of blood relation.
+                Salary Slip, BDO Income Certificate, or Caste Certificate of blood relation.
               </p>
             </div>
 
-            <div className="p-4 rounded-xl bg-white/10 border border-white/15 space-y-2">
+            <div className="p-4 rounded-lg bg-white/10 border border-white/15 space-y-1.5">
               <div className="text-white font-bold text-xs uppercase flex items-center gap-1.5">
-                <Check className="w-4 h-4 text-white" /> Photograph & Signature
+                <Check className="w-4 h-4 text-white" /> Photo & Signature
               </div>
               <p className="text-xs text-slate-200 leading-relaxed">
-                Recent passport-size colour photograph (scanned in under 200 KB in JPEG/PDF).
+                Recent colour photograph scanned under 200 KB in JPEG/PDF format.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 8 & 9. ONLINE APPLICATION GUIDE & OFFLINE BSK ASSISTANCE */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        <div className="text-center max-w-2xl mx-auto space-y-2">
+      {/* 7C. ONLINE VS OFFLINE APPLICATION ASSISTANCE */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        <div className="text-center max-w-2xl mx-auto space-y-1">
           <span className="text-xs font-bold uppercase tracking-wider text-digital">
-            Multiple Application Modes
+            Flexible Submission
           </span>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-navy tracking-tight">
-            Apply Online with Safe Redirection or Visit BSK
+            Online Application vs Bangla Sahayata Kendra
           </h2>
           <p className="text-xs sm:text-sm text-slate-600">
-            Choose the application path that suits your comfort and internet connectivity.
+            Submit directly from your smartphone or visit your local administrative counter.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Online Application Guide Card */}
-          <div className="bg-white p-6 sm:p-8 rounded-xl border border-slate-200 shadow-xs flex flex-col justify-between space-y-6">
-            <div className="space-y-4">
-              <div className="w-11 h-11 rounded-lg bg-digital-50 text-digital border border-digital-200 flex items-center justify-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Online Application Card */}
+          <div className="bg-white p-6 sm:p-8 rounded-xl border border-slate-200 shadow-xs flex flex-col justify-between space-y-5">
+            <div className="space-y-3">
+              <div className="w-10 h-10 rounded-lg bg-digital-50 text-digital border border-digital-200 flex items-center justify-center">
                 <Smartphone className="w-5 h-5" />
               </div>
-              <h3 className="text-xl font-bold text-navy">
-                8. Online Application Guide (Direct Portal)
+              <h3 className="text-lg font-bold text-navy">
+                Online Application Portals
               </h3>
               <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Apply directly from your phone or computer on verified West Bengal e-Governance portals such as e-District 2.0 or Oasis.
+                Apply directly on verified Government of West Bengal web portals like e-District 2.0 or Oasis.
               </p>
-
-              <div className="space-y-2 text-xs text-slate-700">
+              <div className="space-y-1.5 text-xs text-slate-700">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-indiaGreen shrink-0" />
-                  <span>Always free to access 24 hours a day, 7 days a week.</span>
+                  <span>Accessible 24 hours a day, 7 days a week.</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-indiaGreen shrink-0" />
-                  <span>Safe redirection modal confirms you are entering official state domains.</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-indiaGreen shrink-0" />
-                  <span>Immediate Application Identification Number (AIN) issued for tracking.</span>
+                  <span>External redirect modal verifies authentic state domains.</span>
                 </div>
               </div>
             </div>
 
             <Link
               to="/services"
-              className="inline-flex items-center justify-center gap-2 w-full py-3 px-4 rounded-lg bg-digital hover:bg-digital-600 text-white text-xs sm:text-sm font-bold transition-colors"
+              className="inline-flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-lg bg-digital hover:bg-digital-600 text-white text-xs font-bold transition-colors"
             >
-              <span>Browse Online Portals</span>
+              <span>Explore Online Applications</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
           {/* Offline BSK Guidance Card */}
-          <div className="bg-white p-6 sm:p-8 rounded-xl border border-slate-200 shadow-xs flex flex-col justify-between space-y-6">
-            <div className="space-y-4">
-              <div className="w-11 h-11 rounded-lg bg-indiaGreen-50 text-indiaGreen border border-indiaGreen-200 flex items-center justify-center">
+          <div className="bg-white p-6 sm:p-8 rounded-xl border border-slate-200 shadow-xs flex flex-col justify-between space-y-5">
+            <div className="space-y-3">
+              <div className="w-10 h-10 rounded-lg bg-indiaGreen-50 text-indiaGreen border border-indiaGreen-200 flex items-center justify-center">
                 <Building2 className="w-5 h-5" />
               </div>
-              <h3 className="text-xl font-bold text-navy">
-                9. Offline BSK Assistance (Bangla Sahayata Kendra)
+              <h3 className="text-lg font-bold text-navy">
+                Bangla Sahayata Kendra (BSK)
               </h3>
               <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Visit any of the 3,500+ official BSK counters situated in SDO, BDO, and Gram Panchayat offices. Dedicated Data Entry Operators assist you for free.
+                Visit any of the 3,500+ official BSK desks in SDO, BDO, and Gram Panchayat offices for free operator help.
               </p>
-
-              <div className="space-y-2 text-xs text-slate-700">
+              <div className="space-y-1.5 text-xs text-slate-700">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-indiaGreen shrink-0" />
-                  <span>Zero government service charges (100% free assistance).</span>
+                  <span>100% Free: No operator service fees.</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-indiaGreen shrink-0" />
-                  <span>Document scanning and portal upload handled by operators.</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-indiaGreen shrink-0" />
-                  <span>Printed physical receipt handed to you on the spot.</span>
+                  <span>Operators scan your documents and hand you a printed slip.</span>
                 </div>
               </div>
             </div>
 
             <Link
               to="/centre"
-              className="inline-flex items-center justify-center gap-2 w-full py-3 px-4 rounded-lg bg-navy hover:bg-navy-900 text-white text-xs sm:text-sm font-bold transition-colors"
+              className="inline-flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-lg bg-navy hover:bg-navy-900 text-white text-xs font-bold transition-colors"
             >
               <MapPin className="w-4 h-4 text-saffron" />
               <span>Locate Nearest BSK Centre</span>
@@ -606,23 +769,22 @@ const HomePage = ({ onOpenObservationModal }) => {
         </div>
       </section>
 
-      {/* 10. BANGLA SAHAYATA KENDRA CENTRE DIRECTORY */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+      {/* 7D. BSK CENTRE DIRECTORY */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
           <div>
             <div className="inline-flex items-center gap-1.5 text-xs font-bold text-digital uppercase tracking-wider mb-1">
               <MapPin className="w-3.5 h-3.5" />
-              <span>Physical BSK Locator</span>
+              <span>Physical Locations</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-navy tracking-tight">
-              10. Bangla Sahayata Kendra Centre Directory
+              Bangla Sahayata Kendra Directory
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 mt-1">
-              Locate verified office addresses, published operating hours, and weekly holiday schedules.
+              Find verified office addresses and published operating hours.
             </p>
           </div>
 
-          {/* District selector */}
           <div className="flex items-center gap-2">
             <span className="text-xs text-slate-600 font-medium">District:</span>
             <select
@@ -637,11 +799,11 @@ const HomePage = ({ onOpenObservationModal }) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {filteredCentres.map((centre) => (
             <div
               key={centre.id}
-              className="bg-white p-6 rounded-xl border border-slate-200 space-y-4 hover:border-digital transition-colors"
+              className="bg-white p-6 rounded-xl border border-slate-200 space-y-3 hover:border-digital transition-colors"
             >
               <div className="flex items-start justify-between gap-2">
                 <div>
@@ -655,24 +817,24 @@ const HomePage = ({ onOpenObservationModal }) => {
                 </span>
               </div>
 
-              <div className="space-y-1.5 text-xs text-slate-600">
+              <div className="space-y-1 text-xs text-slate-600">
                 <div className="flex items-start gap-2">
                   <MapPin className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
                   <span>{centre.address}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4 text-slate-400 shrink-0" />
-                  <span>{centre.operating_hours || '10:00 AM – 5:00 PM (Monday to Saturday)'}</span>
+                  <span>{centre.operating_hours || '10:00 AM – 5:00 PM (Monday – Saturday)'}</span>
                 </div>
               </div>
 
               <div className="pt-2 flex items-center justify-between text-xs border-t border-slate-100">
-                <span className="text-slate-500">Weekly Off: Sunday & Gazetted Holidays</span>
+                <span className="text-slate-500">Weekly Off: Sunday & State Holidays</span>
                 <Link
                   to={`/centre?id=${centre.id}`}
                   className="font-bold text-digital hover:text-navy flex items-center gap-1"
                 >
-                  View Centre Details <ChevronRight className="w-3.5 h-3.5" />
+                  Centre Details <ChevronRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </div>
@@ -680,17 +842,17 @@ const HomePage = ({ onOpenObservationModal }) => {
         </div>
       </section>
 
-      {/* 11. QUEUE TRACKING COMING SOON SECTION */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-navy text-white rounded-2xl p-8 sm:p-10 border border-navy-700 space-y-6">
-          <div className="max-w-3xl space-y-3">
+      {/* 7E. QUEUE TRACKING COMING SOON SECTION */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-navy text-white rounded-xl p-8 sm:p-10 border border-navy-700 space-y-5">
+          <div className="max-w-3xl space-y-2">
             <div className="inline-flex items-center gap-2 bg-saffron text-navy text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
               <Clock className="w-3.5 h-3.5" />
               <span>Roadmap Status: Coming Soon</span>
             </div>
 
             <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-              11. BSK Queue Tracking — Honest, Verified Data Only
+              BSK Queue Tracking — Coming Soon
             </h2>
 
             <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
@@ -699,7 +861,7 @@ const HomePage = ({ onOpenObservationModal }) => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
-            <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-1">
+            <div className="p-4 rounded-lg bg-white/5 border border-white/10 space-y-1">
               <div className="flex items-center gap-2 text-xs font-bold text-saffron">
                 <CheckCircle2 className="w-4 h-4" /> Zero Fabricated Numbers
               </div>
@@ -708,7 +870,7 @@ const HomePage = ({ onOpenObservationModal }) => {
               </p>
             </div>
 
-            <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-1">
+            <div className="p-4 rounded-lg bg-white/5 border border-white/10 space-y-1">
               <div className="flex items-center gap-2 text-xs font-bold text-digital-200">
                 <CheckCircle2 className="w-4 h-4" /> Crowd Tiers (Low/Med/High)
               </div>
@@ -717,7 +879,7 @@ const HomePage = ({ onOpenObservationModal }) => {
               </p>
             </div>
 
-            <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-1">
+            <div className="p-4 rounded-lg bg-white/5 border border-white/10 space-y-1">
               <div className="flex items-center gap-2 text-xs font-bold text-indiaGreen">
                 <CheckCircle2 className="w-4 h-4" /> Early Pilot Alerts
               </div>
@@ -742,7 +904,7 @@ const HomePage = ({ onOpenObservationModal }) => {
                 <select
                   value={notifyDistrict}
                   onChange={(e) => setNotifyDistrict(e.target.value)}
-                  className="bg-navy-900 text-white text-xs rounded-lg px-3 py-2.5 border border-navy-700 focus:outline-none focus:border-digital"
+                  className="bg-navy-900 text-white text-xs rounded-lg px-3 py-2 border border-navy-700 focus:outline-none focus:border-digital"
                 >
                   <option value="Kolkata">Kolkata</option>
                   <option value="South 24 Parganas">South 24 Parganas</option>
@@ -756,43 +918,17 @@ const HomePage = ({ onOpenObservationModal }) => {
                   placeholder="Enter your email"
                   value={notifyEmail}
                   onChange={(e) => setNotifyEmail(e.target.value)}
-                  className="flex-1 bg-navy-900 text-white text-xs placeholder-slate-400 rounded-lg px-3 py-2.5 border border-navy-700 focus:outline-none focus:border-digital"
+                  className="flex-1 bg-navy-900 text-white text-xs placeholder-slate-400 rounded-lg px-3 py-2 border border-navy-700 focus:outline-none focus:border-digital"
                 />
                 <button
                   type="submit"
-                  className="px-5 py-2.5 bg-saffron hover:bg-saffron-600 text-navy font-bold text-xs rounded-lg transition-colors"
+                  className="px-5 py-2 bg-saffron hover:bg-saffron-600 text-navy font-bold text-xs rounded-lg transition-colors"
                 >
                   Notify Me
                 </button>
               </form>
             )}
           </div>
-        </div>
-      </section>
-
-      {/* 12. TRUST AND INFORMATION VERIFICATION SECTION */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="flex items-start gap-4">
-            <div className="p-3 bg-digital-50 rounded-xl text-digital border border-digital-200 shrink-0">
-              <ShieldCheck className="w-6 h-6" />
-            </div>
-            <div className="space-y-1">
-              <h3 className="font-bold text-base text-navy">
-                12. Trust & Information Verification Pledge
-              </h3>
-              <p className="text-xs text-slate-600 leading-relaxed max-w-3xl">
-                Seva Setu cross-references document requirements with official departmental gazettes of West Bengal. We never ask for Aadhaar cards, PAN numbers, or bank account credentials. All actual applications and certificate issuances occur solely on authorized government systems.
-              </p>
-            </div>
-          </div>
-          <Link
-            to="/disclaimer"
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-navy hover:bg-navy-900 text-white text-xs font-semibold shrink-0 transition-colors"
-          >
-            Read Platform Charter
-            <ChevronRight className="w-4 h-4" />
-          </Link>
         </div>
       </section>
 
