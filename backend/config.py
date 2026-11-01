@@ -9,7 +9,8 @@ class Config:
     JWT_EXPIRATION_HOURS = int(os.getenv('JWT_EXPIRATION_HOURS', '24'))
     
     raw_db_url = os.getenv('DATABASE_URL', '').strip()
-    if raw_db_url:
+    is_placeholder = ('<' in raw_db_url) or ('>' in raw_db_url) or ('neon-host' in raw_db_url)
+    if raw_db_url and not is_placeholder:
         # Normalize postgres:// to postgresql://
         if raw_db_url.startswith('postgres://'):
             raw_db_url = raw_db_url.replace('postgres://', 'postgresql://', 1)
