@@ -5,8 +5,8 @@ services:
     plan: free
     region: oregon
     branch: main
-    buildCommand: "pip install -r backend/requirements.txt"
-    startCommand: "gunicorn --chdir backend run:app --bind 0.0.0.0:$PORT"
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn app:app"
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
