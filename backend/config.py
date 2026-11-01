@@ -10,9 +10,21 @@ class Config:
     
     raw_db_url = os.getenv('DATABASE_URL', '').strip()
     if raw_db_url:
-        # Normalize postgres:// to postgresql:// for SQLAlchemy 1.4+ / 2.0+ (Neon & Render support)
+        # Normalize postgres:// to postgresql://
         if raw_db_url.startswith('postgres://'):
             raw_db_url = raw_db_url.replace('postgres://', 'postgresql://', 1)
+
+        # Ensure dialect matches installed driver (psycopg v3 vs psycopg2 v2)
+        try:
+            import psycopg  # psycopg v3
+        except ImportError:
+            try:
+                import psycopg2
+                if raw_db_url.startswith('postgresql://'):
+                    raw_db_url = raw_db_url.replace('postgresql://', 'postgresql+psycopg2://', 1)
+            except ImportError:
+                pass
+
         SQLALCHEMY_DATABASE_URI = raw_db_url
     else:
         db_path = os.path.join('/tmp', 'sevaqueue.db') if os.getenv('VERCEL') else os.path.join(BASE_DIR, 'sevaqueue.db')
