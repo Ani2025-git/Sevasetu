@@ -10,11 +10,40 @@ import {
   FileCheck, 
   ExternalLink,
   ChevronRight,
+  ChevronLeft,
   Building2,
   CheckCircle2
 } from 'lucide-react';
 import { publicService } from '../services/api';
 import ExternalRedirectModal from '../components/ExternalRedirectModal';
+
+// Curated full-width hero slideshow using user-uploaded citizen service imagery
+const HERO_SLIDES = [
+  {
+    id: 1,
+    url: '/assets/hero/slider-rural-kendra.jpg',
+    alt: 'Rural citizen and facilitator using digital service centre touchscreen',
+    title: 'Digital Citizen Assistance'
+  },
+  {
+    id: 2,
+    url: '/assets/hero/slider-digital-form.jpg',
+    alt: 'Citizen filling online public service form on laptop',
+    title: 'Online Application Portal'
+  },
+  {
+    id: 3,
+    url: '/assets/hero/slider-citizen-desk.jpg',
+    alt: 'Citizen receiving document assistance at public facilitation desk',
+    title: 'Public Service Facilitation'
+  },
+  {
+    id: 4,
+    url: '/assets/hero/citizen-guidance.png',
+    alt: 'Citizen service document checklist and guidance',
+    title: 'Document Checklist & Verification'
+  }
+];
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -22,6 +51,11 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+
+  // Slider State
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isSliderHovered, setIsSliderHovered] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   // External Redirect Modal State
   const [redirectModal, setRedirectModal] = useState({
@@ -46,6 +80,56 @@ const HomePage = () => {
     };
     loadServices();
   }, []);
+
+  // Detect prefers-reduced-motion
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+    const listener = (e) => setPrefersReducedMotion(e.matches);
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', listener);
+      return () => mediaQuery.removeEventListener('change', listener);
+    } else if (mediaQuery.addListener) {
+      mediaQuery.addListener(listener);
+      return () => mediaQuery.removeListener(listener);
+    }
+  }, []);
+
+  // Preload all slider images on mount
+  useEffect(() => {
+    HERO_SLIDES.forEach((slide) => {
+      const img = new Image();
+      img.src = slide.url;
+    });
+  }, []);
+
+  // Preload next upcoming slide image dynamically
+  useEffect(() => {
+    const nextIdx = (currentSlide + 1) % HERO_SLIDES.length;
+    const nextSlide = HERO_SLIDES[nextIdx];
+    if (nextSlide) {
+      const nextImg = new Image();
+      nextImg.src = nextSlide.url;
+    }
+  }, [currentSlide]);
+
+  // Automatic slide rotation every 6 seconds with hover pause
+  useEffect(() => {
+    if (isSliderHovered) return;
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, [isSliderHovered]);
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
+  };
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+  };
 
   const handleHeroSearch = (e) => {
     e.preventDefault();
@@ -144,73 +228,129 @@ const HomePage = () => {
 
   return (
     <div className="bg-[#F5F7FA] text-[#263445] min-h-screen">
-      {/* 3. HERO SECTION (Two-Column Layout) */}
-      <section className="bg-gradient-to-b from-[#EAF2FC] via-[#EAF2FC]/70 to-[#F5F7FA] border-b border-blue-100/60 py-12 sm:py-16 lg:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-            
-            {/* LEFT COLUMN: Content & Search */}
-            <div className="lg:col-span-7 space-y-6">
-              <span className="inline-block text-xs font-bold tracking-wider text-[#2878C8] uppercase bg-white/80 px-3 py-1 rounded-full border border-blue-200/60 shadow-2xs">
-                West Bengal Citizen Services
-              </span>
+      {/* 1. FULL-WIDTH HERO IMAGE SLIDER */}
+      <section 
+        className="relative w-full h-[480px] md:h-[500px] lg:h-[600px] overflow-hidden bg-slate-900 border-b border-slate-200/80"
+        onMouseEnter={() => setIsSliderHovered(true)}
+        onMouseLeave={() => setIsSliderHovered(false)}
+        aria-label="Government Services Hero Slider"
+      >
+        {/* Full-width Slides Layers */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+          {HERO_SLIDES.map((slide, idx) => {
+            const isActive = idx === currentSlide;
+            return (
+              <div
+                key={slide.id}
+                className={`absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out ${
+                  isActive
+                    ? `opacity-100 ${prefersReducedMotion ? 'scale-100' : 'scale-[1.03] duration-[6000ms] ease-out'}`
+                    : 'opacity-0 scale-100 duration-1000'
+                }`}
+                style={{
+                  backgroundImage: `url('${slide.url}')`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }}
+              />
+            );
+          })}
+        </div>
 
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#173B72] tracking-tight leading-tight">
-                Government Services, <br className="hidden sm:inline" />
-                <span className="text-[#F39A32]">Made Simple.</span>
-              </h1>
+        {/* Subtle Left-to-Right Navy Gradient Overlay for Text Readability */}
+        <div 
+          className="absolute inset-y-0 left-0 w-full md:w-3/4 lg:w-3/5 bg-gradient-to-r from-[#0b1c37]/90 via-[#0b1c37]/65 to-transparent pointer-events-none" 
+        />
 
-              <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-xl font-normal">
-                Discover official West Bengal certificate requirements, verify mandatory document checklists, and navigate official application portals without middlemen.
-              </p>
+        {/* Soft Vertical Gradient for Top/Bottom Framing */}
+        <div 
+          className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20 pointer-events-none" 
+        />
 
-              {/* One Prominent Service Search Bar */}
-              <div className="pt-2 max-w-xl">
-                <form 
-                  onSubmit={handleHeroSearch} 
-                  className="flex flex-col sm:flex-row items-stretch sm:items-center bg-white rounded-xl border border-slate-300 shadow-sm focus-within:border-[#2878C8] focus-within:ring-2 focus-within:ring-[#2878C8]/15 transition-all p-1.5 gap-2"
+        {/* Hero Content (Positioned on the Left) */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
+          <div className="max-w-xl lg:max-w-2xl space-y-4 sm:space-y-6 text-left">
+            {/* West Bengal Citizen Services Label */}
+            <span className="inline-block text-xs font-bold tracking-wider text-[#F39A32] uppercase bg-navy-950/80 px-3.5 py-1.5 rounded-full border border-white/20 backdrop-blur-xs shadow-md">
+              West Bengal Citizen Services
+            </span>
+
+            {/* Main Heading */}
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight drop-shadow-[0_2px_12px_rgba(0,0,0,0.85)]">
+              Government Services, <br className="hidden sm:inline" />
+              <span className="text-[#F39A32]">Made Simple.</span>
+            </h1>
+
+            {/* Exact Required Description */}
+            <p className="text-sm sm:text-base lg:text-lg text-slate-100 leading-relaxed font-normal max-w-xl drop-shadow-[0_1px_6px_rgba(0,0,0,0.9)]">
+              Discover government services, understand required documents, and access official application portals through one simple platform.
+            </p>
+
+            {/* Prominent Service Search Bar */}
+            <div className="pt-2 max-w-xl">
+              <form 
+                onSubmit={handleHeroSearch} 
+                className="flex flex-col sm:flex-row items-stretch sm:items-center bg-white rounded-xl border border-slate-300 shadow-2xl focus-within:border-[#2878C8] focus-within:ring-2 focus-within:ring-[#2878C8]/25 transition-all p-1.5 gap-2"
+              >
+                <div className="relative flex-1 flex items-center">
+                  <Search className="w-5 h-5 text-slate-400 absolute left-3 pointer-events-none" />
+                  <input
+                    type="text"
+                    placeholder="Search Income Certificate, Caste, Residence..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 text-sm sm:text-base text-[#173B72] placeholder-slate-400 font-medium bg-transparent focus:outline-none"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="px-6 py-3 bg-[#173B72] hover:bg-[#2878C8] text-white font-medium text-sm rounded-lg transition-colors flex items-center justify-center gap-2 shadow-xs shrink-0"
                 >
-                  <div className="relative flex-1 flex items-center">
-                    <Search className="w-5 h-5 text-slate-400 absolute left-3 pointer-events-none" />
-                    <input
-                      type="text"
-                      placeholder="Search Income Certificate, Caste, Residence..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2.5 text-sm sm:text-base text-[#173B72] placeholder-slate-400 font-medium bg-transparent focus:outline-none"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    className="px-6 py-3 bg-[#173B72] hover:bg-[#2878C8] text-white font-medium text-sm rounded-lg transition-colors flex items-center justify-center gap-2 shadow-xs shrink-0"
-                  >
-                    <span>Search</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </form>
-              </div>
+                  <span>Search</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </form>
             </div>
-
-            {/* RIGHT COLUMN: Clean Citizen Service Illustration Container */}
-            <div className="lg:col-span-5 flex justify-center">
-              <div className="w-full max-w-md bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
-                <img
-                  src="/assets/hero/digital-services.png"
-                  alt="Indian citizen accessing digital public services"
-                  className="w-full h-auto max-h-[360px] object-contain rounded-xl"
-                  onError={(e) => {
-                    // Fallback to local illustration
-                    e.currentTarget.src = '/assets/hero/citizen-service.png';
-                  }}
-                />
-              </div>
-            </div>
-
           </div>
+        </div>
+
+        {/* Previous / Next Controls */}
+        <button
+          type="button"
+          onClick={prevSlide}
+          aria-label="Previous Slide"
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/30 hover:bg-black/60 text-white flex items-center justify-center backdrop-blur-xs transition-colors border border-white/20 hidden sm:flex"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+        <button
+          type="button"
+          onClick={nextSlide}
+          aria-label="Next Slide"
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/30 hover:bg-black/60 text-white flex items-center justify-center backdrop-blur-xs transition-colors border border-white/20 hidden sm:flex"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
+
+        {/* Small Slide Indicators */}
+        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2" aria-label="Slideshow indicators">
+          {HERO_SLIDES.map((slide, idx) => (
+            <button
+              key={slide.id}
+              type="button"
+              onClick={() => setCurrentSlide(idx)}
+              aria-label={`Go to slide ${idx + 1}`}
+              className={`transition-all duration-300 rounded-full shadow-sm ${
+                idx === currentSlide
+                  ? 'w-7 h-2 bg-[#F39A32]'
+                  : 'w-2 h-2 bg-white/50 hover:bg-white/80'
+              }`}
+            />
+          ))}
         </div>
       </section>
 
-      {/* 4. POPULAR SERVICES */}
+      {/* 2. POPULAR SERVICES (Directly below the Hero Section) */}
       <section className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-10 text-center sm:text-left">
           <h2 className="text-2xl sm:text-3xl font-bold text-[#173B72]">
@@ -261,7 +401,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* 5. EXPLORE SERVICES */}
+      {/* 3. EXPLORE SERVICES */}
       <section className="py-16 bg-white border-y border-slate-200/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
@@ -364,7 +504,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* 6. BSK CENTRE SECTION */}
+      {/* 4. BSK CENTRE SECTION */}
       <section className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-[#EAF2FC] rounded-2xl border border-blue-100 p-8 sm:p-12 text-center max-w-4xl mx-auto shadow-xs">
           <div className="max-w-2xl mx-auto space-y-4">
@@ -393,7 +533,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* 7. HOW IT WORKS */}
+      {/* 5. HOW IT WORKS */}
       <section className="py-16 bg-white border-t border-slate-200/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-12">
