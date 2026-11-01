@@ -74,7 +74,7 @@ const RegisterPage = () => {
       console.error('Registration error:', err);
       setError(
         err.response?.data?.message ||
-        'Registration failed. This email may already be in use.'
+        'Registration failed. Please check your information and try again.'
       );
     } finally {
       setLoading(false);

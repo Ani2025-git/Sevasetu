@@ -51,11 +51,16 @@ api.interceptors.response.use(
 );
 
 export const authService = {
-  login: (email, password) => api.post('/auth/login', { email, password }),
+  login: (email, password) =>
+    api.post('/auth/login', {
+      email: (email || '').trim().toLowerCase(),
+      password,
+    }),
   register: (fullName, email, password, confirmPassword) =>
     api.post('/auth/register', {
-      full_name: fullName,
-      email,
+      name: (fullName || '').trim(),
+      full_name: (fullName || '').trim(),
+      email: (email || '').trim().toLowerCase(),
       password,
       confirm_password: confirmPassword,
     }),

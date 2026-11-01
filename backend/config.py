@@ -8,12 +8,20 @@ class Config:
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'sevaqueue-jwt-secret-key-wb-pilot-2026')
     JWT_EXPIRATION_HOURS = int(os.getenv('JWT_EXPIRATION_HOURS', '24'))
     
-    db_path = os.path.join('/tmp', 'sevaqueue.db') if os.getenv('VERCEL') else os.path.join(BASE_DIR, 'sevaqueue.db')
-    SQLALCHEMY_DATABASE_URI = os.getenv(
-        'DATABASE_URL',
-        f"sqlite:///{db_path}"
-    )
+    raw_db_url = os.getenv('DATABASE_URL', '').strip()
+    if raw_db_url:
+        # Normalize postgres:// to postgresql:// for SQLAlchemy 1.4+ / 2.0+ (Neon & Render support)
+        if raw_db_url.startswith('postgres://'):
+            raw_db_url = raw_db_url.replace('postgres://', 'postgresql://', 1)
+        SQLALCHEMY_DATABASE_URI = raw_db_url
+    else:
+        db_path = os.path.join('/tmp', 'sevaqueue.db') if os.getenv('VERCEL') else os.path.join(BASE_DIR, 'sevaqueue.db')
+        SQLALCHEMY_DATABASE_URI = f"sqlite:///{db_path}"
+
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_pre_ping': True,
+    }
     
     # Stale queue threshold in minutes (default 30 mins for this pilot)
     DEFAULT_STALE_THRESHOLD_MINUTES = int(os.getenv('STALE_THRESHOLD_MINUTES', '30'))

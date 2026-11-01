@@ -10,14 +10,14 @@ from app.models.user import User
 
 app = create_app()
 
-# Auto-seed database if it doesn't have the demo users yet
+# Ensure default records exist without wiping user accounts
 with app.app_context():
     try:
         db.create_all()
-        if not User.query.filter_by(email="admin@sevaqueue.org").first():
+        if not User.query.filter_by(email="admin@sevasetu.org").first():
             from seed import seed_database
-            seed_database()
-            print("Auto-seeded database for deployment.")
+            seed_database(drop_existing=False)
+            print("Auto-seeded default records for Seva Setu deployment.")
     except Exception as e:
         print(f"Startup DB check: {e}")
 

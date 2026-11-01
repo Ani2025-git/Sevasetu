@@ -15,13 +15,13 @@ from app.models.user import User
 
 app = create_app()
 
-# Auto-seed database on serverless cold start if needed
+# Auto-seed database on serverless cold start if needed without dropping user records
 with app.app_context():
     try:
         db.create_all()
-        if not User.query.filter_by(email="admin@sevaqueue.org").first():
+        if not User.query.filter_by(email="admin@sevasetu.org").first():
             from seed import seed_database
-            seed_database()
+            seed_database(drop_existing=False)
             print("Auto-seeded database in serverless environment.")
     except Exception as e:
         print(f"Serverless DB setup check: {e}")

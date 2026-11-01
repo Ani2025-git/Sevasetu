@@ -10,8 +10,8 @@ auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
 @auth_bp.route('/register', methods=['POST'])
 def register():
     data = request.get_json() or {}
-    name = sanitize_text(data.get('name', ''))
-    email = sanitize_text(data.get('email', '')).lower()
+    name = sanitize_text(data.get('name') or data.get('full_name') or '')
+    email = sanitize_text(data.get('email', '')).strip().lower()
     password = data.get('password', '')
     confirm_password = data.get('confirm_password', '')
 
@@ -27,7 +27,7 @@ def register():
     if confirm_password and password != confirm_password:
         return jsonify({'success': False, 'message': 'Passwords do not match.'}), 400
 
-    if User.query.filter_by(email=email).first():
+    if User.query.filter(db.func.lower(User.email) == email).first():
         return jsonify({'success': False, 'message': 'An account with this email already exists.'}), 400
 
     user = User(
@@ -53,15 +53,15 @@ def register():
 @auth_bp.route('/login', methods=['POST'])
 def login():
     data = request.get_json() or {}
-    email = data.get('email', '').strip().lower()
+    email = sanitize_text(data.get('email', '')).strip().lower()
     password = data.get('password', '')
 
     if not email or not password:
         return jsonify({'success': False, 'message': 'Email and password are required.'}), 400
 
-    user = User.query.filter_by(email=email).first()
+    user = User.query.filter(db.func.lower(User.email) == email).first()
     if not user or not user.check_password(password):
-        return jsonify({'success': False, 'message': 'Invalid email or password.'}), 401
+        return jsonify({'success': False, 'message': 'Invalid email or password. Please try again.'}), 401
 
     if not user.is_active:
         return jsonify({'success': False, 'message': 'This account has been deactivated.'}), 403
