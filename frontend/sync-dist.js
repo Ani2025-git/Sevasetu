@@ -36,3 +36,4 @@ if (fs.existsSync(frontendDist) && !fs.existsSync(rootDist)) {
   copyDir(frontendDist, rootDist);
   console.log('Synchronized dist folders across root and frontend');
 }
+
