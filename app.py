@@ -30,8 +30,9 @@ with app.app_context():
         from app.models import db
         from app.models.user import User
         db.create_all()
+        from seed import ensure_demo_users, seed_database
+        ensure_demo_users()
         if not User.query.filter_by(email="admin@sevasetu.org").first():
-            from seed import seed_database
             seed_database(drop_existing=False)
             print("Auto-seeded default records for Seva Setu deployment.")
     except Exception as e:

@@ -12,6 +12,34 @@ from app.models.setting import Setting
 
 app = create_app()
 
+DEMO_USERS_SPEC = [
+    ('admin@sevasetu.org', 'Platform Administrator', 'admin', 'Admin@123'),
+    ('observer@sevasetu.org', 'Field Observer Rahul', 'observer', 'Observer@123'),
+    ('citizen@sevasetu.org', 'Sample Citizen Ananya', 'citizen', 'Citizen@123'),
+    ('admin@sevaqueue.org', 'Platform Administrator', 'admin', 'Admin@123'),
+    ('observer@sevaqueue.org', 'Field Observer Rahul', 'observer', 'Observer@123'),
+    ('citizen@sevaqueue.org', 'Sample Citizen Ananya', 'citizen', 'Citizen@123'),
+]
+
+def ensure_demo_users():
+    for email, name, role, password in DEMO_USERS_SPEC:
+        user = User.query.filter(db.func.lower(User.email) == email.lower()).first()
+        if not user:
+            user = User(
+                name=name,
+                email=email,
+                role=role,
+                is_active=True
+            )
+            user.set_password(password)
+            db.session.add(user)
+        else:
+            user.role = role
+            user.is_active = True
+            user.set_password(password)
+    db.session.commit()
+    print("Verified all demo users.")
+
 def seed_database(drop_existing=False):
     with app.app_context():
         if drop_existing:
@@ -28,36 +56,9 @@ def seed_database(drop_existing=False):
             Setting.set('queue_feature_status', 'COMING_SOON', 'Queue feature status')
             print("Initialized default settings.")
 
-        # Seed Users if admin not present
+        # Ensure all demo users exist with guaranteed credentials
+        ensure_demo_users()
         admin = User.query.filter_by(email="admin@sevasetu.org").first()
-        if not admin:
-            admin = User(
-                name="Platform Administrator",
-                email="admin@sevasetu.org",
-                role="admin",
-                is_active=True
-            )
-            admin.set_password("Admin@123")
-
-            observer = User(
-                name="Field Observer Rahul",
-                email="observer@sevasetu.org",
-                role="observer",
-                is_active=True
-            )
-            observer.set_password("Observer@123")
-
-            citizen = User(
-                name="Sample Citizen Ananya",
-                email="citizen@sevasetu.org",
-                role="citizen",
-                is_active=True
-            )
-            citizen.set_password("Citizen@123")
-
-            db.session.add_all([admin, observer, citizen])
-            db.session.commit()
-            print("Created users: admin@sevasetu.org, observer@sevasetu.org, citizen@sevasetu.org")
 
         # Seed Sample BSK Centres if empty
         if Centre.query.count() == 0:
