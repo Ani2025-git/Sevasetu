@@ -1,190 +1,81 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldAlert, ExternalLink, ShieldCheck, Landmark } from 'lucide-react';
 
 const Footer = () => {
   return (
-    <footer className="bg-navy text-slate-200 mt-20 border-t border-navy-700">
-      {/* Tricolor Accent Bar */}
-      <div className="h-1 w-full flex">
-        <div className="h-full flex-1 bg-saffron" />
-        <div className="h-full flex-1 bg-white" />
-        <div className="h-full flex-1 bg-indiaGreen" />
-      </div>
-
-      {/* Citizen Safety & Transparency Strip */}
-      <div className="bg-navy-900 border-b border-navy-700 py-6 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center gap-4">
-          <div className="p-2.5 bg-saffron/15 text-saffron rounded-xl border border-saffron/30 shrink-0">
-            <ShieldAlert className="w-5 h-5" />
-          </div>
-          <div className="text-xs space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-white text-sm">Citizen Transparency & Safety Charter</span>
-              <span className="text-[10px] bg-saffron text-navy font-bold px-2 py-0.5 rounded uppercase tracking-wider">
-                Independent Platform
+    <footer className="bg-white border-t border-slate-200 text-[#263445] mt-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          {/* Brand & Description */}
+          <div className="md:col-span-2 space-y-3">
+            <Link to="/" className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-[#173B72] flex items-center justify-center text-white shadow-xs">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-[#F39A32]">
+                  <path d="M4 19V9a8 8 0 0 1 16 0v10" />
+                  <path d="M4 14h16" />
+                  <path d="M12 9v10" />
+                </svg>
+              </div>
+              <span className="text-lg font-bold tracking-tight text-[#173B72]">
+                Seva <span className="text-[#F39A32]">Setu</span>
               </span>
-            </div>
-            <p className="text-slate-300 leading-relaxed max-w-5xl">
-              <strong>Seva Setu</strong> is an independent citizen assistance portal developed to simplify West Bengal public services and document requirements. It is not an official government platform and does not possess administrative affiliation with the Government of West Bengal or Bangla Sahayata Kendras. Official application submissions take place strictly on verified state portals (e.g., <code>edistrict.wb.gov.in</code>, <code>castcertificatewb.gov.in</code>). Seva Setu never asks for OTPs, fees, or personal identity cards.
+            </Link>
+            <p className="text-sm text-slate-600 max-w-md leading-relaxed">
+              An independent civic platform designed to help West Bengal citizens understand government certificate procedures, prepare required documents, and access official application portals directly.
             </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Footer Links */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 md:grid-cols-4 gap-8">
-        {/* Brand Column */}
-        <div className="space-y-3.5 md:col-span-1">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-saffron border border-white/20">
-              <Landmark className="w-4 h-4 text-saffron" />
-            </div>
-            <div>
-              <span className="text-lg font-black text-white tracking-tight">Seva Setu</span>
-              <span className="text-[10px] font-bold text-saffron ml-1.5 uppercase">WB</span>
+            <div className="p-3 bg-[#F5F7FA] rounded-lg border border-slate-200/80 text-xs text-slate-600">
+              <strong className="text-[#173B72] block mb-0.5">Independent Citizen Initiative:</strong>
+              Seva Setu is not an official government website and has no administrative affiliation with the Government of West Bengal or Bangla Sahayata Kendras. All applications are completed exclusively on official government portals.
             </div>
           </div>
-          <p className="text-xs text-slate-300 leading-relaxed">
-            "Your Government Services, Made Simple." Helping West Bengal citizens understand mandatory documents, find nearby BSK desks, and apply securely through official government portals.
-          </p>
-          <div className="text-[11px] text-slate-400 space-y-0.5 pt-2 border-t border-navy-700">
-            <p className="text-slate-200 font-semibold">Scope of Service:</p>
-            <p>Citizen Information & Document Preparation • West Bengal, India</p>
+
+          {/* Quick Links */}
+          <div>
+            <h4 className="text-xs font-semibold text-[#173B72] uppercase tracking-wider mb-3">Quick Links</h4>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <Link to="/services" className="text-slate-600 hover:text-[#2878C8] transition-colors">
+                  Services Directory
+                </Link>
+              </li>
+              <li>
+                <Link to="/centre" className="text-slate-600 hover:text-[#2878C8] transition-colors">
+                  BSK Centres
+                </Link>
+              </li>
+              <li>
+                <Link to="/disclaimer" className="text-slate-600 hover:text-[#2878C8] transition-colors">
+                  About Platform
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Legal & Compliance */}
+          <div>
+            <h4 className="text-xs font-semibold text-[#173B72] uppercase tracking-wider mb-3">Compliance & Legal</h4>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <Link to="/disclaimer" className="text-slate-600 hover:text-[#2878C8] transition-colors">
+                  Disclaimer
+                </Link>
+              </li>
+              <li>
+                <Link to="/privacy" className="text-slate-600 hover:text-[#2878C8] transition-colors">
+                  Privacy Policy
+                </Link>
+              </li>
+            </ul>
           </div>
         </div>
 
-        {/* Certificate Services */}
-        <div>
-          <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-3.5 flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-saffron" />
-            Public Certificate Guides
-          </h4>
-          <ul className="space-y-2 text-xs">
-            <li>
-              <Link to="/services" className="text-slate-300 hover:text-white transition-colors">Income Certificate</Link>
-            </li>
-            <li>
-              <Link to="/services" className="text-slate-300 hover:text-white transition-colors">Caste Certificate (SC / ST / OBC)</Link>
-            </li>
-            <li>
-              <Link to="/services" className="text-slate-300 hover:text-white transition-colors">Residential & Domicile Proof</Link>
-            </li>
-            <li>
-              <Link to="/services" className="text-slate-300 hover:text-white transition-colors">Birth Registration Certificate</Link>
-            </li>
-            <li>
-              <Link to="/services" className="text-slate-300 hover:text-white transition-colors">Death Certificate Registration</Link>
-            </li>
-            <li>
-              <Link to="/services" className="text-slate-300 hover:text-white transition-colors">Digital Ration Card (NFSA / RKSY)</Link>
-            </li>
-          </ul>
-        </div>
-
-        {/* Official Resources */}
-        <div>
-          <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-3.5 flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-digital" />
-            Official State Portals
-          </h4>
-          <ul className="space-y-2 text-xs">
-            <li>
-              <a
-                href="https://bsk.wb.gov.in"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-white transition-colors inline-flex items-center gap-1.5 text-digital-200 hover:underline"
-              >
-                Bangla Sahayata Kendra <ExternalLink className="w-3 h-3 text-digital" />
-              </a>
-            </li>
-            <li>
-              <a
-                href="https://edistrict.wb.gov.in"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-white transition-colors inline-flex items-center gap-1.5 text-digital-200 hover:underline"
-              >
-                WB e-District 2.0 <ExternalLink className="w-3 h-3 text-digital" />
-              </a>
-            </li>
-            <li>
-              <a
-                href="https://castcertificatewb.gov.in"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-white transition-colors inline-flex items-center gap-1.5 text-digital-200 hover:underline"
-              >
-                Oasis Caste Portal <ExternalLink className="w-3 h-3 text-digital" />
-              </a>
-            </li>
-            <li>
-              <a
-                href="https://janmamrityutathya.wb.gov.in"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-white transition-colors inline-flex items-center gap-1.5 text-digital-200 hover:underline"
-              >
-                Janma-Mrityu Tathya <ExternalLink className="w-3 h-3 text-digital" />
-              </a>
-            </li>
-            <li>
-              <a
-                href="https://food.wb.gov.in"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-white transition-colors inline-flex items-center gap-1.5 text-digital-200 hover:underline"
-              >
-                Food & Supplies Dept <ExternalLink className="w-3 h-3 text-digital" />
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        {/* Assistance & Policies */}
-        <div>
-          <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-3.5 flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-indiaGreen" />
-            Citizen Assistance
-          </h4>
-          <ul className="space-y-2 text-xs">
-            <li>
-              <Link to="/centre" className="text-slate-300 hover:text-white transition-colors">Find Nearest BSK Centre</Link>
-            </li>
-            <li>
-              <Link to="/queue" className="text-slate-300 hover:text-white transition-colors">Queue Status Roadmap</Link>
-            </li>
-            <li>
-              <Link to="/disclaimer" className="text-slate-300 hover:text-white transition-colors">Platform Charter & Disclaimer</Link>
-            </li>
-            <li>
-              <Link to="/login" className="text-slate-300 hover:text-white transition-colors">Citizen & Staff Login</Link>
-            </li>
-          </ul>
-
-          <div className="mt-5 p-3.5 bg-navy-900 rounded-xl border border-navy-700 text-[11px] text-slate-300 space-y-1">
-            <div className="flex items-center gap-1.5 text-indiaGreen font-bold">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              Free Government Service
-            </div>
-            <p>
-              Data Entry Operators at BSK counters provide digital form submission completely free of charge.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Copyright Line */}
-      <div className="border-t border-navy-700 py-6 px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-400">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p>© {new Date().getFullYear()} Seva Setu. Independent civic technology platform for West Bengal.</p>
-          <div className="flex items-center gap-4 text-xs">
-            <Link to="/disclaimer" className="hover:text-slate-200 transition-colors">Legal Disclaimer</Link>
+        {/* Bottom Bar */}
+        <div className="mt-12 pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-3">
+          <p>© {new Date().getFullYear()} Seva Setu. Independent citizen service platform for West Bengal.</p>
+          <div className="flex items-center gap-4">
+            <Link to="/disclaimer" className="hover:text-[#173B72] transition-colors">Disclaimer</Link>
             <span>•</span>
-            <Link to="/privacy" className="hover:text-slate-200 transition-colors">Citizen Privacy</Link>
-            <span>•</span>
-            <span className="text-slate-300">West Bengal, India</span>
+            <Link to="/privacy" className="hover:text-[#173B72] transition-colors">Privacy Policy</Link>
           </div>
         </div>
       </div>
