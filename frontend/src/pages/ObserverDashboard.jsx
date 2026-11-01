@@ -113,13 +113,13 @@ const ObserverDashboard = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-blue-900 to-navy-900 text-white rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm">
+      <div className="bg-navy text-white rounded-xl p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border border-navy-700">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="bg-blue-400 text-slate-900 text-[10px] font-bold uppercase px-2 py-0.5 rounded tracking-wider">
+            <span className="bg-saffron text-navy text-[10px] font-bold uppercase px-2 py-0.5 rounded tracking-wider">
               Field Observer Portal
             </span>
-            <span className="text-xs text-blue-200">Independent Pilot Protocol</span>
+            <span className="text-xs text-slate-300">Independent Pilot Protocol</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
             Observer Dashboard — {user?.name}
@@ -253,7 +253,7 @@ const ObserverDashboard = () => {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full py-3 px-4 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full py-2.5 px-4 rounded-lg bg-digital hover:bg-digital-600 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-xs flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 <Send className="w-3.5 h-3.5" />
                 {submitting ? 'Submitting...' : 'Submit for Admin Review'}

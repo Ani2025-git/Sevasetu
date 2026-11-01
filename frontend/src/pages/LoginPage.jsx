@@ -66,76 +66,76 @@ const LoginPage = () => {
     <div className="max-w-md mx-auto px-4 py-16 space-y-6">
       {/* Brand Header */}
       <div className="text-center space-y-2">
-        <div className="w-12 h-12 bg-navy-950 rounded-2xl flex items-center justify-center text-blue-400 mx-auto shadow-lg border border-blue-900/50">
-          <Landmark className="w-6 h-6" />
+        <div className="w-12 h-12 bg-navy rounded-xl flex items-center justify-center text-saffron mx-auto shadow-sm border border-navy-700">
+          <Landmark className="w-6 h-6 text-saffron" />
         </div>
-        <h1 className="text-2xl font-black text-slate-900 tracking-tight">Sign In to Seva Setu</h1>
+        <h1 className="text-2xl font-black text-navy tracking-tight">Sign In to Seva Setu</h1>
         <p className="text-xs text-slate-500">
-          Access your citizen saved checklists, observer field updates, or administration portal.
+          Access your citizen saved checklists, observer reports, or administration panel.
         </p>
       </div>
 
       {isExpired && (
-        <div className="p-3.5 bg-amber-50 border border-amber-200 text-amber-900 text-xs rounded-xl flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 text-amber-700 shrink-0" />
+        <div className="p-3 bg-saffron-50 border border-saffron-200 text-saffron-900 text-xs rounded-lg flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 text-saffron shrink-0" />
           <span>Your session has expired. Please sign in again to continue.</span>
         </div>
       )}
 
       {error && (
-        <div className="p-3.5 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-xl flex items-center gap-2">
+        <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-lg flex items-center gap-2">
           <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {/* Demo Credentials Quick-Select Pill Box */}
-      <div className="bg-slate-100/90 border border-slate-200 rounded-2xl p-4 space-y-2.5">
-        <p className="text-[11px] font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
-          <KeyRound className="w-3.5 h-3.5 text-blue-600" />
-          Quick Demo Credentials (One Click Fill)
+      <div className="bg-surface border border-slate-200 rounded-xl p-3.5 space-y-2">
+        <p className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+          <KeyRound className="w-3.5 h-3.5 text-digital" />
+          Demo Access Credentials (One Click Fill)
         </p>
         <div className="grid grid-cols-3 gap-2">
           <button
             type="button"
             onClick={() => fillDemoCredentials('citizen')}
-            className="p-2 rounded-xl bg-white border border-slate-300 hover:border-blue-500 hover:bg-blue-50 text-left text-xs transition-all shadow-sm group"
+            className="p-2 rounded-lg bg-white border border-slate-200 hover:border-digital text-left text-xs transition-colors shadow-2xs"
           >
-            <p className="font-bold text-navy-900 group-hover:text-blue-700 flex items-center gap-1 text-[11px]">
-              <User className="w-3 h-3 text-blue-600" /> Citizen
+            <p className="font-bold text-navy flex items-center gap-1 text-[11px]">
+              <User className="w-3 h-3 text-digital" /> Citizen
             </p>
-            <p className="text-[9px] text-slate-400 mt-0.5 truncate">citizen@sevasetu.org</p>
+            <p className="text-[9px] text-slate-500 mt-0.5 truncate">citizen@sevasetu.org</p>
           </button>
 
           <button
             type="button"
             onClick={() => fillDemoCredentials('admin')}
-            className="p-2 rounded-xl bg-white border border-slate-300 hover:border-blue-500 hover:bg-blue-50 text-left text-xs transition-all shadow-sm group"
+            className="p-2 rounded-lg bg-white border border-slate-200 hover:border-digital text-left text-xs transition-colors shadow-2xs"
           >
-            <p className="font-bold text-navy-900 group-hover:text-blue-700 flex items-center gap-1 text-[11px]">
-              <ShieldCheck className="w-3 h-3 text-indigo-600" /> Admin
+            <p className="font-bold text-navy flex items-center gap-1 text-[11px]">
+              <ShieldCheck className="w-3 h-3 text-saffron" /> Admin
             </p>
-            <p className="text-[9px] text-slate-400 mt-0.5 truncate">admin@sevasetu.org</p>
+            <p className="text-[9px] text-slate-500 mt-0.5 truncate">admin@sevasetu.org</p>
           </button>
 
           <button
             type="button"
             onClick={() => fillDemoCredentials('observer')}
-            className="p-2 rounded-xl bg-white border border-slate-300 hover:border-blue-500 hover:bg-blue-50 text-left text-xs transition-all shadow-sm group"
+            className="p-2 rounded-lg bg-white border border-slate-200 hover:border-digital text-left text-xs transition-colors shadow-2xs"
           >
-            <p className="font-bold text-navy-900 group-hover:text-blue-700 flex items-center gap-1 text-[11px]">
-              <UserCheck className="w-3 h-3 text-emerald-600" /> Observer
+            <p className="font-bold text-navy flex items-center gap-1 text-[11px]">
+              <UserCheck className="w-3 h-3 text-indiaGreen" /> Observer
             </p>
-            <p className="text-[9px] text-slate-400 mt-0.5 truncate">observer@sevasetu.org</p>
+            <p className="text-[9px] text-slate-500 mt-0.5 truncate">observer@sevasetu.org</p>
           </button>
         </div>
       </div>
 
       {/* Form Card */}
-      <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm">
+      <div className="bg-white p-6 sm:p-8 rounded-xl border border-slate-200 shadow-xs">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
               Email Address
             </label>
             <div className="relative">
@@ -145,14 +145,14 @@ const LoginPage = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="name@sevasetu.org"
-                className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800"
+                placeholder="citizen@sevasetu.org"
+                className="w-full pl-9 pr-3 py-2.5 rounded-lg border border-slate-300 text-xs sm:text-sm focus:outline-none focus:border-digital text-navy"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
               Password
             </label>
             <div className="relative">
@@ -163,7 +163,7 @@ const LoginPage = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800"
+                className="w-full pl-9 pr-3 py-2.5 rounded-lg border border-slate-300 text-xs sm:text-sm focus:outline-none focus:border-digital text-navy"
               />
             </div>
           </div>
@@ -171,9 +171,9 @@ const LoginPage = () => {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full py-3 px-4 rounded-xl bg-navy-900 hover:bg-navy-800 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-md flex items-center justify-center gap-2 mt-2 disabled:opacity-50"
+            className="w-full py-2.5 px-4 rounded-lg bg-digital hover:bg-digital-600 text-white font-bold text-xs uppercase tracking-wider transition-colors shadow-xs flex items-center justify-center gap-2 mt-2 disabled:opacity-50"
           >
-            {submitting ? 'Authenticating...' : 'Sign In to Portal'}
+            {submitting ? 'Authenticating...' : 'Sign In'}
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>
@@ -181,17 +181,17 @@ const LoginPage = () => {
         <div className="mt-5 pt-4 border-t border-slate-100 text-center">
           <p className="text-xs text-slate-600">
             Don't have an account yet?{' '}
-            <Link to="/register" className="text-blue-600 font-bold hover:underline">
-              Create a free Citizen Account
+            <Link to="/register" className="text-digital font-bold hover:underline">
+              Create a Citizen Account
             </Link>
           </p>
         </div>
       </div>
 
       <p className="text-center text-xs text-slate-500">
-        Citizens do not require an account to browse services or view center details.{' '}
-        <Link to="/" className="text-blue-700 font-bold hover:underline">
-          Return to Public Homepage
+        Registration is optional for citizens browsing services.{' '}
+        <Link to="/" className="text-digital font-bold hover:underline">
+          Return to Homepage
         </Link>
       </p>
     </div>

@@ -20,13 +20,14 @@ import {
   Bell,
   Eye,
   History,
-  CheckSquare
+  CheckSquare,
+  Settings
 } from 'lucide-react';
 import ExternalRedirectModal from '../components/ExternalRedirectModal';
 
 const CitizenDashboard = () => {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('saved'); // 'saved', 'recent', 'notifications'
+  const [activeTab, setActiveTab] = useState('saved'); // 'saved', 'recent', 'notifications', 'profile'
   const [savedServices, setSavedServices] = useState([]);
   const [recentServices, setRecentServices] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -128,16 +129,15 @@ const CitizenDashboard = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Profile Header Card */}
-      <div className="bg-gradient-to-r from-navy-950 via-navy-900 to-blue-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
-        <div className="absolute right-0 top-0 bottom-0 w-80 bg-blue-500/10 [mask-image:radial-gradient(white,transparent_70%)] pointer-events-none" />
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="bg-navy text-white rounded-xl p-6 sm:p-8 border border-navy-700">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center text-blue-300 border border-white/20 font-black text-2xl shadow-inner">
+            <div className="w-14 h-14 rounded-lg bg-white/10 flex items-center justify-center text-saffron border border-white/20 font-black text-2xl">
               {user?.full_name ? user.full_name.charAt(0).toUpperCase() : (user?.name?.charAt(0) || 'C')}
             </div>
             <div>
-              <div className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-300 uppercase tracking-wider">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <div className="inline-flex items-center gap-1.5 text-xs font-bold text-saffron uppercase tracking-wider">
+                <ShieldCheck className="w-3.5 h-3.5" />
                 Citizen Portal Profile
               </div>
               <h1 className="text-2xl sm:text-3xl font-black text-white">
@@ -150,23 +150,23 @@ const CitizenDashboard = () => {
           <div className="flex flex-wrap items-center gap-3">
             <Link
               to="/services"
-              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-colors shadow-sm"
+              className="inline-flex items-center gap-2 bg-digital hover:bg-digital-600 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition-colors"
             >
               <Search className="w-4 h-4" />
               <span>Browse All Services</span>
             </Link>
             <Link
               to="/centre"
-              className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition-colors border border-white/20"
+              className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold px-4 py-2.5 rounded-lg transition-colors border border-white/20"
             >
-              <MapPin className="w-4 h-4 text-blue-300" />
+              <MapPin className="w-4 h-4 text-saffron" />
               <span>Find BSK Centre</span>
             </Link>
           </div>
         </div>
 
         {/* Quick Stats Strip */}
-        <div className="grid grid-cols-3 gap-3 pt-6 mt-6 border-t border-white/10 max-w-xl text-xs">
+        <div className="grid grid-cols-3 gap-3 pt-6 mt-6 border-t border-navy-700 max-w-xl text-xs">
           <div>
             <span className="text-slate-400 block text-[11px]">Saved Services</span>
             <span className="text-lg font-bold text-white">{savedServices.length}</span>
@@ -177,19 +177,19 @@ const CitizenDashboard = () => {
           </div>
           <div>
             <span className="text-slate-400 block text-[11px]">BSK Assistance</span>
-            <span className="text-lg font-bold text-emerald-400">100% Free</span>
+            <span className="text-lg font-bold text-indiaGreen">100% Free</span>
           </div>
         </div>
       </div>
 
-      {/* Modern Tab Bar */}
-      <div className="flex items-center gap-2 border-b border-slate-200 pb-3">
+      {/* Modern Navigation Tabs */}
+      <div className="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto">
         <button
           onClick={() => setActiveTab('saved')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold whitespace-nowrap transition-colors ${
             activeTab === 'saved'
-              ? 'bg-navy-950 text-white shadow-xs'
-              : 'text-slate-600 hover:bg-slate-100'
+              ? 'bg-navy text-white'
+              : 'text-slate-700 hover:bg-slate-100'
           }`}
         >
           <Bookmark className="w-4 h-4" />
@@ -198,10 +198,10 @@ const CitizenDashboard = () => {
 
         <button
           onClick={() => setActiveTab('recent')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold whitespace-nowrap transition-colors ${
             activeTab === 'recent'
-              ? 'bg-navy-950 text-white shadow-xs'
-              : 'text-slate-600 hover:bg-slate-100'
+              ? 'bg-navy text-white'
+              : 'text-slate-700 hover:bg-slate-100'
           }`}
         >
           <History className="w-4 h-4" />
@@ -210,14 +210,26 @@ const CitizenDashboard = () => {
 
         <button
           onClick={() => setActiveTab('notifications')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold whitespace-nowrap transition-colors ${
             activeTab === 'notifications'
-              ? 'bg-navy-950 text-white shadow-xs'
-              : 'text-slate-600 hover:bg-slate-100'
+              ? 'bg-navy text-white'
+              : 'text-slate-700 hover:bg-slate-100'
           }`}
         >
           <Bell className="w-4 h-4" />
-          <span>Notifications & Circulars</span>
+          <span>Notifications</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('profile')}
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold whitespace-nowrap transition-colors ${
+            activeTab === 'profile'
+              ? 'bg-navy text-white'
+              : 'text-slate-700 hover:bg-slate-100'
+          }`}
+        >
+          <Settings className="w-4 h-4" />
+          <span>Profile Settings</span>
         </button>
       </div>
 
@@ -225,25 +237,25 @@ const CitizenDashboard = () => {
       {activeTab === 'saved' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <CheckSquare className="w-5 h-5 text-blue-600" />
+            <h2 className="text-lg font-bold text-navy flex items-center gap-2">
+              <CheckSquare className="w-5 h-5 text-digital" />
               Bookmarked Services & Document Progress
             </h2>
-            <span className="text-xs font-semibold text-slate-500">
-              Checklist state is saved automatically to your device
+            <span className="text-xs text-slate-500">
+              Checklist state is saved locally on your device
             </span>
           </div>
 
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {[1, 2].map((i) => (
-                <div key={i} className="h-44 bg-slate-100 rounded-3xl animate-pulse" />
+                <div key={i} className="h-44 bg-slate-100 rounded-xl animate-pulse" />
               ))}
             </div>
           ) : savedServices.length === 0 ? (
-            <div className="bg-white rounded-3xl border border-dashed border-slate-300 p-12 text-center space-y-4">
-              <Bookmark className="w-12 h-12 text-slate-300 mx-auto" />
-              <h3 className="text-base font-semibold text-slate-800">
+            <div className="bg-white rounded-xl border border-dashed border-slate-300 p-12 text-center space-y-4">
+              <Bookmark className="w-10 h-10 text-slate-300 mx-auto" />
+              <h3 className="text-base font-semibold text-navy">
                 No Saved Services Yet
               </h3>
               <p className="text-xs text-slate-500 max-w-sm mx-auto">
@@ -251,7 +263,7 @@ const CitizenDashboard = () => {
               </p>
               <Link
                 to="/services"
-                className="inline-flex items-center gap-2 bg-navy-950 hover:bg-navy-900 text-white text-xs font-semibold px-5 py-2.5 rounded-xl transition-colors"
+                className="inline-flex items-center gap-2 bg-navy hover:bg-navy-900 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors"
               >
                 Explore Certificate Directory
                 <ArrowRight className="w-4 h-4" />
@@ -267,11 +279,11 @@ const CitizenDashboard = () => {
                 return (
                   <div
                     key={service_id}
-                    className="bg-white rounded-3xl border border-slate-200/90 p-6 hover:shadow-lg transition-all duration-200 flex flex-col justify-between space-y-4 group"
+                    className="bg-white rounded-xl border border-slate-200 p-6 flex flex-col justify-between space-y-4"
                   >
                     <div className="space-y-3">
                       <div className="flex items-start justify-between gap-2">
-                        <span className="text-[11px] font-semibold uppercase px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200/60">
+                        <span className="text-[11px] font-semibold uppercase px-2.5 py-0.5 rounded bg-digital-50 text-digital border border-digital-200">
                           {service.category || 'Certificate'}
                         </span>
                         <button
@@ -285,7 +297,7 @@ const CitizenDashboard = () => {
 
                       <Link
                         to={`/services/${service.id}`}
-                        className="text-lg font-bold text-slate-900 group-hover:text-blue-600 transition-colors block line-clamp-1"
+                        className="text-lg font-bold text-navy hover:text-digital transition-colors block line-clamp-1"
                       >
                         {service.name}
                       </Link>
@@ -295,18 +307,18 @@ const CitizenDashboard = () => {
                         <span className="truncate">{service.department || 'West Bengal'}</span>
                       </div>
 
-                      {/* Checklist Progress Ring/Bar */}
-                      <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100 space-y-1.5">
+                      {/* Checklist Progress Bar */}
+                      <div className="bg-surface p-3 rounded-lg border border-slate-200 space-y-1.5">
                         <div className="flex items-center justify-between text-xs font-semibold">
                           <span className="text-slate-700">Checklist Ready:</span>
-                          <span className={percent === 100 ? 'text-emerald-600 font-bold' : 'text-blue-600 font-bold'}>
+                          <span className={percent === 100 ? 'text-indiaGreen font-bold' : 'text-digital font-bold'}>
                             {percent}% ({completedCount}/{totalDocs} Docs)
                           </span>
                         </div>
                         <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
                           <div
                             className={`h-full transition-all duration-300 rounded-full ${
-                              percent === 100 ? 'bg-emerald-500' : 'bg-blue-600'
+                              percent === 100 ? 'bg-indiaGreen' : 'bg-digital'
                             }`}
                             style={{ width: `${percent}%` }}
                           />
@@ -317,7 +329,7 @@ const CitizenDashboard = () => {
                     <div className="flex items-center gap-2 pt-3 border-t border-slate-100">
                       <Link
                         to={`/services/${service.id}`}
-                        className="flex-1 inline-flex items-center justify-center gap-1.5 bg-navy-950 hover:bg-navy-900 text-white text-xs font-semibold py-2.5 px-3 rounded-xl transition-colors shadow-sm"
+                        className="flex-1 inline-flex items-center justify-center gap-1.5 bg-navy hover:bg-navy-900 text-white text-xs font-semibold py-2 px-3 rounded-lg transition-colors"
                       >
                         <span>Checklist & Guide</span>
                         <ArrowRight className="w-3.5 h-3.5" />
@@ -326,7 +338,7 @@ const CitizenDashboard = () => {
                       {service.online_apply_url && (
                         <button
                           onClick={(e) => handleApplyClick(service, e)}
-                          className="inline-flex items-center justify-center gap-1 bg-white hover:bg-slate-50 text-blue-700 border border-slate-300 text-xs font-semibold py-2.5 px-3 rounded-xl transition-colors shadow-sm"
+                          className="inline-flex items-center justify-center gap-1 bg-white hover:bg-slate-50 text-digital border border-digital-300 text-xs font-semibold py-2 px-3 rounded-lg transition-colors"
                         >
                           <span>Apply</span>
                           <ExternalLink className="w-3.5 h-3.5" />
@@ -345,8 +357,8 @@ const CitizenDashboard = () => {
       {activeTab === 'recent' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <Eye className="w-5 h-5 text-blue-600" />
+            <h2 className="text-lg font-bold text-navy flex items-center gap-2">
+              <Eye className="w-5 h-5 text-digital" />
               Recently Viewed Services
             </h2>
             <button
@@ -354,14 +366,14 @@ const CitizenDashboard = () => {
                 localStorage.removeItem('sevasetu_recently_viewed');
                 setRecentServices([]);
               }}
-              className="text-xs text-slate-400 hover:text-slate-600 underline"
+              className="text-xs text-slate-500 hover:text-navy underline"
             >
               Clear history
             </button>
           </div>
 
           {recentServices.length === 0 ? (
-            <div className="bg-white rounded-3xl border border-dashed border-slate-300 p-12 text-center space-y-3">
+            <div className="bg-white rounded-xl border border-dashed border-slate-300 p-12 text-center space-y-3">
               <History className="w-10 h-10 text-slate-300 mx-auto" />
               <p className="text-xs text-slate-500">
                 You haven't viewed any service guides in this session yet.
@@ -372,13 +384,13 @@ const CitizenDashboard = () => {
               {recentServices.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-white p-5 rounded-2xl border border-slate-200/90 hover:border-blue-400 transition-all flex flex-col justify-between space-y-3"
+                  className="bg-white p-5 rounded-xl border border-slate-200 hover:border-digital transition-colors flex flex-col justify-between space-y-3"
                 >
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 text-slate-600">
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-surface text-slate-700">
                       {item.category || 'Certificate'}
                     </span>
-                    <h3 className="text-base font-bold text-slate-900 mt-2 line-clamp-1">
+                    <h3 className="text-base font-bold text-navy mt-2 line-clamp-1">
                       {item.name}
                     </h3>
                     <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">
@@ -387,7 +399,7 @@ const CitizenDashboard = () => {
                   </div>
                   <Link
                     to={`/services/${item.id}`}
-                    className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 pt-2 border-t border-slate-100"
+                    className="text-xs font-bold text-digital hover:text-navy flex items-center gap-1 pt-2 border-t border-slate-100"
                   >
                     Open Guide <ChevronRight className="w-3.5 h-3.5" />
                   </Link>
@@ -401,21 +413,21 @@ const CitizenDashboard = () => {
       {/* TAB CONTENT: NOTIFICATIONS */}
       {activeTab === 'notifications' && (
         <div className="space-y-4">
-          <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-            <Bell className="w-5 h-5 text-blue-600" />
-            Platform Updates & State Circulars
+          <h2 className="text-lg font-bold text-navy flex items-center gap-2">
+            <Bell className="w-5 h-5 text-digital" />
+            Platform Updates & Notifications
           </h2>
 
           <div className="space-y-3">
             {notifications.map((n) => (
               <div
                 key={n.id}
-                className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs flex items-start justify-between gap-4"
+                className="bg-white p-5 rounded-xl border border-slate-200 flex items-start justify-between gap-4"
               >
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-blue-600" />
-                    <h3 className="font-bold text-sm text-slate-900">{n.title}</h3>
+                    <span className="w-2 h-2 rounded-full bg-saffron" />
+                    <h3 className="font-bold text-sm text-navy">{n.title}</h3>
                   </div>
                   <p className="text-xs text-slate-600 pl-4">{n.desc}</p>
                 </div>
@@ -424,6 +436,53 @@ const CitizenDashboard = () => {
                 </span>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* TAB CONTENT: PROFILE SETTINGS */}
+      {activeTab === 'profile' && (
+        <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-6 max-w-2xl">
+          <h2 className="text-lg font-bold text-navy flex items-center gap-2">
+            <Settings className="w-5 h-5 text-digital" />
+            Citizen Profile Settings
+          </h2>
+
+          <div className="space-y-4 text-xs">
+            <div>
+              <label className="block text-slate-600 font-semibold mb-1">Full Name</label>
+              <input
+                type="text"
+                disabled
+                value={user?.full_name || user?.name || ''}
+                className="w-full p-2.5 rounded-lg border border-slate-300 bg-surface text-navy font-medium"
+              />
+            </div>
+
+            <div>
+              <label className="block text-slate-600 font-semibold mb-1">Email Address</label>
+              <input
+                type="email"
+                disabled
+                value={user?.email || ''}
+                className="w-full p-2.5 rounded-lg border border-slate-300 bg-surface text-navy font-medium"
+              />
+            </div>
+
+            <div>
+              <label className="block text-slate-600 font-semibold mb-1">Citizen Role</label>
+              <input
+                type="text"
+                disabled
+                value={user?.role || 'Citizen'}
+                className="w-full p-2.5 rounded-lg border border-slate-300 bg-surface text-navy font-medium uppercase"
+              />
+            </div>
+          </div>
+
+          <div className="p-3.5 bg-surface rounded-lg border border-slate-200 text-xs text-slate-600 flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-indiaGreen shrink-0" />
+            <span>Citizen privacy guaranteed: Your account details are never shared with third parties.</span>
           </div>
         </div>
       )}

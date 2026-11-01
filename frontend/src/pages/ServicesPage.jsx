@@ -15,8 +15,8 @@ import {
   Sparkles,
   Info,
   X,
-  ArrowUpDown,
-  Compass
+  Compass,
+  Calendar
 } from 'lucide-react';
 import { publicService } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -30,7 +30,6 @@ const ServicesPage = () => {
   const [categories, setCategories] = useState(['All']);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
-  const [sortBy, setSortBy] = useState('name');
   const [loading, setLoading] = useState(true);
   const [savedIds, setSavedIds] = useState(new Set());
   
@@ -117,55 +116,45 @@ const ServicesPage = () => {
     });
   };
 
-  const filteredServices = services
-    .filter((s) => {
-      const matchesCategory = selectedCategory === 'All' || s.category === selectedCategory;
-      const q = searchQuery.toLowerCase().trim();
-      if (!q) return matchesCategory;
-      const matchesSearch = 
-        s.name.toLowerCase().includes(q) ||
-        (s.description && s.description.toLowerCase().includes(q)) ||
-        (s.department && s.department.toLowerCase().includes(q)) ||
-        (s.required_documents && s.required_documents.some(d => d.toLowerCase().includes(q)));
-      return matchesCategory && matchesSearch;
-    })
-    .sort((a, b) => {
-      if (sortBy === 'name') {
-        return a.name.localeCompare(b.name);
-      }
-      return 0;
-    });
+  const filteredServices = services.filter((s) => {
+    const matchesCategory = selectedCategory === 'All' || s.category === selectedCategory;
+    const q = searchQuery.toLowerCase().trim();
+    if (!q) return matchesCategory;
+    const matchesSearch = 
+      s.name.toLowerCase().includes(q) ||
+      (s.description && s.description.toLowerCase().includes(q)) ||
+      (s.department && s.department.toLowerCase().includes(q)) ||
+      (s.required_documents && s.required_documents.some(d => d.toLowerCase().includes(q)));
+    return matchesCategory && matchesSearch;
+  });
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Header Banner */}
-      <div className="bg-gradient-to-r from-navy-950 via-navy-900 to-blue-900 text-white rounded-3xl p-8 sm:p-10 shadow-xl relative overflow-hidden border border-blue-900/40">
-        <div className="absolute -right-10 -bottom-10 w-96 h-96 bg-blue-500/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 max-w-3xl space-y-3">
-          <div className="inline-flex items-center gap-2 bg-blue-500/20 text-blue-300 text-xs font-semibold px-3 py-1.5 rounded-full border border-blue-400/30">
-            <ShieldCheck className="w-4 h-4 text-blue-400" />
-            <span>Official West Bengal Citizen Services Directory</span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-            Government Certificates & Public Services
-          </h1>
-          <p className="text-xs sm:text-sm md:text-base text-slate-300 leading-relaxed font-normal">
-            Verify eligibility criteria, prepare your mandatory document checklists, review processing timelines, and access official state application portals without middlemen.
-          </p>
+      {/* Header Banner - Digital India Style */}
+      <div className="bg-navy text-white rounded-2xl p-6 sm:p-8 border border-navy-700 space-y-3">
+        <div className="inline-flex items-center gap-2 bg-saffron text-navy text-xs font-bold px-3 py-0.5 rounded uppercase tracking-wider">
+          <ShieldCheck className="w-3.5 h-3.5" />
+          <span>West Bengal Public Service Directory</span>
         </div>
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white">
+          Government Certificate Directory
+        </h1>
+        <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-normal max-w-3xl">
+          Complete eligibility guidelines, document requirements, expected processing times, and official direct application portals for citizens of West Bengal.
+        </p>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-white p-5 rounded-3xl border border-slate-200/90 shadow-sm space-y-4">
+      <div className="bg-white p-5 rounded-xl border border-slate-200 space-y-4">
         <div className="flex flex-col md:flex-row items-center gap-4">
           <div className="relative flex-1 w-full">
             <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
-              placeholder="Search by certificate name (e.g. Income, Caste, Residence), department, or document..."
+              placeholder="Search by certificate (e.g. Income, Caste, Residence), department, or document..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-10 py-3 rounded-2xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 placeholder-slate-400 bg-slate-50/50"
+              className="w-full pl-10 pr-10 py-2.5 rounded-lg border border-slate-300 text-sm focus:outline-none focus:border-digital text-navy placeholder-slate-400 bg-surface"
             />
             {searchQuery && (
               <button
@@ -184,10 +173,10 @@ const ServicesPage = () => {
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
                     selectedCategory === cat
-                      ? 'bg-navy-950 text-white shadow-xs'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      ? 'bg-navy text-white'
+                      : 'bg-surface text-slate-700 hover:bg-slate-200 border border-slate-200'
                   }`}
                 >
                   {cat}
@@ -198,69 +187,66 @@ const ServicesPage = () => {
         </div>
 
         <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100">
-          <span>Showing <strong className="text-slate-900">{filteredServices.length}</strong> verified services</span>
-          <span className="flex items-center gap-1 text-slate-500">
-            <Info className="w-3.5 h-3.5 text-blue-600" />
-            Guidelines cross-checked with West Bengal departmental notifications
+          <span>Showing <strong className="text-navy">{filteredServices.length}</strong> verified public services</span>
+          <span className="flex items-center gap-1 text-slate-600">
+            <Info className="w-3.5 h-3.5 text-digital" />
+            Information cross-checked with official West Bengal notifications
           </span>
         </div>
       </div>
 
-      {/* Loading Skeleton */}
+      {/* Services Grid */}
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="h-64 bg-slate-100 rounded-3xl animate-pulse" />
+            <div key={i} className="h-64 bg-slate-100 rounded-xl animate-pulse" />
           ))}
         </div>
       ) : filteredServices.length === 0 ? (
-        <div className="text-center py-16 bg-white rounded-3xl border border-dashed border-slate-300 space-y-4">
-          <FileText className="w-12 h-12 text-slate-400 mx-auto" />
-          <h3 className="text-base font-semibold text-slate-800">No Services Found</h3>
+        <div className="text-center py-16 bg-white rounded-xl border border-dashed border-slate-300 space-y-4">
+          <FileText className="w-12 h-12 text-slate-300 mx-auto" />
+          <h3 className="text-base font-semibold text-navy">No Services Found</h3>
           <p className="text-xs sm:text-sm text-slate-500 max-w-sm mx-auto">
             We couldn't find any government service matching "{searchQuery}". Try searching for Income, Caste, or Residence.
           </p>
           <button
             onClick={() => { setSearchQuery(''); setSelectedCategory('All'); }}
-            className="text-xs text-blue-600 font-bold hover:underline"
+            className="text-xs text-digital font-bold hover:underline"
           >
             Clear all filters
           </button>
         </div>
       ) : (
-        /* Services Grid */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredServices.map((service) => {
             const isSaved = savedIds.has(service.id);
             return (
               <div
                 key={service.id}
-                className="group bg-white rounded-3xl border border-slate-200/90 hover:border-blue-400 hover:shadow-xl transition-all duration-200 flex flex-col justify-between overflow-hidden"
+                className="bg-white rounded-xl border border-slate-200 hover:border-digital hover:shadow-sm transition-all flex flex-col justify-between overflow-hidden"
               >
-                <div className="p-6 space-y-4">
-                  {/* Top tags & bookmark */}
+                <div className="p-6 space-y-3.5">
                   <div className="flex items-start justify-between gap-3">
-                    <span className="text-[11px] font-semibold tracking-wide uppercase px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200/60">
+                    <span className="text-[11px] font-semibold uppercase px-2.5 py-0.5 rounded bg-digital-50 text-digital border border-digital-200">
                       {service.category || 'Certificate'}
                     </span>
                     <button
                       onClick={(e) => toggleSave(service.id, e)}
                       title={isSaved ? 'Remove from Saved' : 'Save Service'}
-                      className={`p-2 rounded-xl border transition-colors ${
+                      className={`p-1.5 rounded-lg border transition-colors ${
                         isSaved
-                          ? 'bg-amber-50 text-amber-600 border-amber-200'
-                          : 'text-slate-400 hover:text-slate-700 border-slate-200 hover:bg-slate-50'
+                          ? 'bg-saffron-50 text-saffron-700 border-saffron-300'
+                          : 'text-slate-400 hover:text-navy border-slate-200 hover:bg-slate-50'
                       }`}
                     >
-                      <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
+                      <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-current text-saffron' : ''}`} />
                     </button>
                   </div>
 
-                  {/* Title & Department */}
                   <div>
                     <Link
                       to={`/services/${service.id}`}
-                      className="text-lg font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-1"
+                      className="text-lg font-bold text-navy hover:text-digital transition-colors line-clamp-1"
                     >
                       {service.name}
                     </Link>
@@ -270,54 +256,45 @@ const ServicesPage = () => {
                     </div>
                   </div>
 
-                  {/* Description */}
                   <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
                     {service.description}
                   </p>
 
-                  {/* Meta Badges */}
                   <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-slate-100">
-                    <div className="flex items-center gap-1.5 text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                      <Clock className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                    <div className="flex items-center gap-1.5 text-slate-700 bg-surface p-2 rounded-lg border border-slate-100">
+                      <Clock className="w-3.5 h-3.5 text-digital shrink-0" />
                       <span className="truncate font-semibold">{service.expected_processing_time || '7 - 15 Days'}</span>
                     </div>
-                    <div className="flex items-center gap-1.5 text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                      <IndianRupee className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                      <span className="truncate font-bold text-emerald-700">{service.fees || 'Free'}</span>
+                    <div className="flex items-center gap-1.5 text-slate-700 bg-surface p-2 rounded-lg border border-slate-100">
+                      <IndianRupee className="w-3.5 h-3.5 text-indiaGreen shrink-0" />
+                      <span className="truncate font-bold text-indiaGreen">{service.fees || 'Free'}</span>
                     </div>
                   </div>
 
-                  {/* Document preview */}
                   {service.required_documents && service.required_documents.length > 0 && (
-                    <div className="space-y-1.5 bg-blue-50/50 p-3 rounded-2xl border border-blue-100/70">
+                    <div className="space-y-1 bg-digital-50/40 p-2.5 rounded-lg border border-digital-100">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="font-semibold text-slate-800">Required Documents</span>
-                        <span className="text-[11px] font-bold text-blue-700">
+                        <span className="font-semibold text-navy">Required Documents</span>
+                        <span className="text-[11px] font-bold text-digital">
                           {service.required_documents.length} items
                         </span>
                       </div>
                       <ul className="text-[11px] text-slate-600 space-y-1">
                         {service.required_documents.slice(0, 2).map((doc, idx) => (
                           <li key={idx} className="flex items-center gap-1.5 truncate">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                            <CheckCircle2 className="w-3 h-3 text-indiaGreen shrink-0" />
                             <span className="truncate">{doc}</span>
                           </li>
                         ))}
-                        {service.required_documents.length > 2 && (
-                          <li className="text-[10px] text-slate-400 italic pl-5">
-                            + {service.required_documents.length - 2} more documents...
-                          </li>
-                        )}
                       </ul>
                     </div>
                   )}
                 </div>
 
-                {/* Footer action buttons */}
-                <div className="px-6 py-4 bg-slate-50/80 border-t border-slate-100 flex items-center gap-2">
+                <div className="px-6 py-3.5 bg-surface border-t border-slate-200 flex items-center gap-2">
                   <Link
                     to={`/services/${service.id}`}
-                    className="flex-1 inline-flex items-center justify-center gap-1.5 bg-navy-950 hover:bg-navy-900 text-white text-xs font-semibold py-2.5 px-3 rounded-xl transition-colors shadow-sm"
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 bg-navy hover:bg-navy-900 text-white text-xs font-semibold py-2 px-3 rounded-lg transition-colors"
                   >
                     <span>Checklist & Guide</span>
                     <ChevronRight className="w-3.5 h-3.5" />
@@ -327,7 +304,7 @@ const ServicesPage = () => {
                     <button
                       onClick={(e) => handleApplyClick(service, e)}
                       title="Apply on Official State Portal"
-                      className="inline-flex items-center justify-center gap-1 bg-white hover:bg-slate-100 text-blue-700 border border-slate-300 text-xs font-semibold py-2.5 px-3 rounded-xl transition-colors shadow-sm"
+                      className="inline-flex items-center justify-center gap-1 bg-white hover:bg-slate-50 text-digital border border-digital-300 text-xs font-semibold py-2 px-3 rounded-lg transition-colors"
                     >
                       <span>Apply</span>
                       <ExternalLink className="w-3.5 h-3.5" />

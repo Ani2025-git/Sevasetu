@@ -1,6 +1,6 @@
 # Seva Setu — Connecting Citizens with Government Services
 
-> **"Government Services, Made Simpler."**  
+> **"Your Government Services, Made Simple."**  
 > An independent digital citizen assistance platform and government service guide for **West Bengal, India**.
 
 ---

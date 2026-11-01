@@ -18,7 +18,7 @@ def health():
     return jsonify({
         'status': 'healthy',
         'application': 'Seva Setu',
-        'tagline': 'Government Services, Made Simpler.',
+        'tagline': 'Your Government Services, Made Simple.',
         'timestamp': datetime.utcnow().isoformat(),
         'mode': 'independent-citizen-assistance-platform'
     }), 200

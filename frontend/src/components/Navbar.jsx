@@ -13,10 +13,10 @@ import {
   Bookmark, 
   User, 
   ArrowRight, 
-  Compass,
-  Sparkles,
   Search,
-  ExternalLink
+  ExternalLink,
+  HelpCircle,
+  Sparkles
 } from 'lucide-react';
 
 const Navbar = ({ onOpenObservationModal }) => {
@@ -30,29 +30,40 @@ const Navbar = ({ onOpenObservationModal }) => {
   };
 
   const navLinkClass = ({ isActive }) =>
-    `text-xs lg:text-[13px] font-semibold transition-all duration-150 px-3.5 py-2 rounded-xl flex items-center gap-1.5 ${
+    `text-xs lg:text-[13px] font-semibold transition-colors px-3 py-2 rounded-lg flex items-center gap-1.5 ${
       isActive
-        ? 'text-blue-700 bg-blue-50/90 font-bold shadow-xs'
-        : 'text-slate-600 hover:text-blue-700 hover:bg-slate-100/70'
+        ? 'text-digital font-bold bg-digital-50 border-b-2 border-digital'
+        : 'text-slate-700 hover:text-navy hover:bg-slate-100/80'
     }`;
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs transition-all">
-      {/* Top Civic Utility & Disclaimer Bar */}
-      <div className="bg-navy-950 text-slate-300 text-[11px] px-4 py-1.5 border-b border-navy-900/50">
+    <header className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-xs transition-all">
+      {/* Digital India Tricolor Hairline Accent */}
+      <div className="h-1 w-full flex">
+        <div className="h-full flex-1 bg-saffron" />
+        <div className="h-full flex-1 bg-white border-y border-slate-200" />
+        <div className="h-full flex-1 bg-indiaGreen" />
+      </div>
+
+      {/* Top Citizen Utility & Transparency Strip */}
+      <div className="bg-navy text-slate-200 text-[11px] px-4 py-1.5 border-b border-navy-900">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="bg-blue-500/20 text-blue-300 border border-blue-400/30 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
-              Independent Civic Platform
+            <span className="bg-saffron text-navy font-bold text-[10px] px-2 py-0.5 rounded uppercase tracking-wider">
+              Citizen Initiative
             </span>
-            <span className="hidden md:inline text-slate-300 font-medium">
-              Simplifying West Bengal Government Services & Certificate Requirements
+            <span className="hidden sm:inline font-medium text-slate-200">
+              West Bengal Citizen Services Guide • Not officially affiliated with Government of WB
             </span>
+            <span className="sm:hidden text-slate-300">WB Public Service Guide</span>
           </div>
-          <div className="flex items-center gap-4 text-slate-400 text-[11px]">
-            <span className="hidden sm:inline">West Bengal, India</span>
-            <Link to="/disclaimer" className="hover:text-blue-300 transition-colors">
-              Independent Disclaimer
+
+          <div className="flex items-center gap-4 text-slate-300 text-[11px]">
+            <span className="hidden md:inline text-saffron-200 font-medium">
+              আপনার সরকারি পরিষেবা, সহজ সমাধান
+            </span>
+            <Link to="/disclaimer" className="text-slate-300 hover:text-white transition-colors">
+              Disclaimer
             </Link>
           </div>
         </div>
@@ -62,25 +73,25 @@ const Navbar = ({ onOpenObservationModal }) => {
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
         {/* Brand Logo */}
         <Link to="/" className="flex items-center gap-3 group shrink-0">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-navy-900 via-blue-800 to-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-900/10 group-hover:scale-105 transition-transform duration-200">
-            {/* Bridge / Connection Arch SVG */}
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-white">
+          <div className="w-10 h-10 rounded-xl bg-navy flex items-center justify-center text-white shadow-sm border border-navy-700 group-hover:scale-105 transition-transform">
+            {/* Bridge / Citizen Connectivity Icon */}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-saffron">
               <path d="M4 19V9a8 8 0 0 1 16 0v10" />
               <path d="M4 14h16" />
               <path d="M12 9v10" />
-              <circle cx="12" cy="5" r="1.5" fill="currentColor" />
+              <circle cx="12" cy="5" r="1.5" fill="#16865B" />
             </svg>
           </div>
           <div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-xl font-black tracking-tight text-navy-950 font-sans">Seva</span>
-              <span className="text-xl font-black tracking-tight text-blue-600 font-sans">Setu</span>
-              <span className="text-[10px] uppercase font-bold tracking-widest bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded-md">
+            <div className="flex items-center gap-1.5 leading-none">
+              <span className="text-xl font-black text-navy tracking-tight font-sans">Seva</span>
+              <span className="text-xl font-black text-digital tracking-tight font-sans">Setu</span>
+              <span className="text-[10px] uppercase font-bold tracking-wider bg-digital-50 text-digital border border-digital-200 px-1.5 py-0.5 rounded">
                 WB
               </span>
             </div>
-            <p className="text-[11px] text-slate-500 -mt-0.5 font-medium tracking-tight">
-              Government Services, Made Simpler.
+            <p className="text-[11px] text-slate-600 font-medium tracking-tight mt-1">
+              Your Government Services, Made Simple.
             </p>
           </div>
         </Link>
@@ -91,18 +102,18 @@ const Navbar = ({ onOpenObservationModal }) => {
             Home
           </NavLink>
           <NavLink to="/services" className={navLinkClass}>
-            <FileText className="w-4 h-4 text-blue-600" />
-            <span>Certificates & Services</span>
+            <FileText className="w-4 h-4 text-digital" />
+            <span>Certificate Directory</span>
           </NavLink>
           <NavLink to="/centre" className={navLinkClass}>
             <Building2 className="w-4 h-4 text-slate-500" />
-            <span>Find BSK Centre</span>
+            <span>Bangla Sahayata Kendra</span>
           </NavLink>
           <NavLink to="/queue" className={navLinkClass}>
-            <Clock className="w-4 h-4 text-amber-500" />
-            <span>Queue Info</span>
-            <span className="text-[9px] font-bold uppercase tracking-wider bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-full ml-0.5">
-              Soon
+            <Clock className="w-4 h-4 text-saffron" />
+            <span>Queue Status</span>
+            <span className="text-[9px] font-bold uppercase tracking-wider bg-saffron-100 text-saffron-800 px-1.5 py-0.5 rounded-full ml-1">
+              Coming Soon
             </span>
           </NavLink>
           <NavLink to="/disclaimer" className={navLinkClass}>
@@ -117,16 +128,16 @@ const Navbar = ({ onOpenObservationModal }) => {
               {isAdmin && (
                 <Link
                   to="/admin"
-                  className="text-xs font-bold px-3 py-2 rounded-xl bg-navy-950 text-white hover:bg-navy-900 transition-colors flex items-center gap-1.5 shadow-sm"
+                  className="text-xs font-bold px-3 py-2 rounded-lg bg-navy text-white hover:bg-navy-900 transition-colors flex items-center gap-1.5 shadow-xs"
                 >
-                  <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
+                  <ShieldCheck className="w-3.5 h-3.5 text-saffron" />
                   Admin
                 </Link>
               )}
               {isObserver && !isAdmin && (
                 <Link
                   to="/observer"
-                  className="text-xs font-bold px-3 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-colors flex items-center gap-1.5 shadow-sm"
+                  className="text-xs font-bold px-3 py-2 rounded-lg bg-digital text-white hover:bg-digital-600 transition-colors flex items-center gap-1.5 shadow-xs"
                 >
                   <UserCheck className="w-3.5 h-3.5" />
                   Observer
@@ -135,26 +146,26 @@ const Navbar = ({ onOpenObservationModal }) => {
               {!isAdmin && !isObserver && (
                 <Link
                   to="/dashboard"
-                  className="text-xs font-bold px-3.5 py-2 rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors flex items-center gap-1.5 border border-blue-200/60"
+                  className="text-xs font-bold px-3 py-2 rounded-lg bg-digital-50 text-digital border border-digital-200 hover:bg-digital-100 transition-colors flex items-center gap-1.5"
                 >
-                  <Bookmark className="w-3.5 h-3.5 text-blue-600" />
-                  My Dashboard
+                  <Bookmark className="w-3.5 h-3.5 text-digital" />
+                  Dashboard
                 </Link>
               )}
 
               {/* Citizen User Badge */}
               <Link
                 to="/dashboard"
-                className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl hover:bg-slate-100 transition-colors group"
+                className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-slate-100 transition-colors group"
               >
-                <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">
+                <div className="w-8 h-8 rounded-full bg-navy text-saffron flex items-center justify-center font-bold text-xs shadow-xs border border-navy-700">
                   {user?.full_name ? user.full_name.charAt(0).toUpperCase() : (user?.name?.charAt(0) || 'C')}
                 </div>
                 <div className="text-left hidden xl:block">
-                  <p className="text-xs font-bold text-slate-800 leading-tight group-hover:text-blue-600 truncate max-w-[120px]">
+                  <p className="text-xs font-bold text-navy leading-tight group-hover:text-digital truncate max-w-[120px]">
                     {user?.full_name || user?.name || 'Citizen'}
                   </p>
-                  <p className="text-[10px] text-slate-400 uppercase font-semibold">
+                  <p className="text-[10px] text-slate-500 uppercase font-semibold">
                     {user?.role || 'Citizen'}
                   </p>
                 </div>
@@ -163,7 +174,7 @@ const Navbar = ({ onOpenObservationModal }) => {
               <button
                 onClick={handleLogout}
                 title="Sign Out"
-                className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
+                className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
               >
                 <LogOut className="w-4 h-4" />
               </button>
@@ -172,15 +183,15 @@ const Navbar = ({ onOpenObservationModal }) => {
             <div className="flex items-center gap-2">
               <Link
                 to="/login"
-                className="text-xs font-bold px-3.5 py-2 text-slate-700 hover:text-navy-950 hover:bg-slate-100 rounded-xl transition-colors"
+                className="text-xs font-bold px-3.5 py-2 text-navy hover:text-digital hover:bg-slate-100 rounded-lg transition-colors"
               >
-                Sign In
+                Citizen Sign In
               </Link>
               <Link
                 to="/register"
-                className="text-xs font-bold px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition-all shadow-sm hover:shadow-md flex items-center gap-1.5"
+                className="text-xs font-bold px-4 py-2 rounded-lg bg-digital hover:bg-digital-600 text-white transition-all shadow-xs flex items-center gap-1.5"
               >
-                <span>Citizen Register</span>
+                <span>Register</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -191,7 +202,7 @@ const Navbar = ({ onOpenObservationModal }) => {
         <div className="flex lg:hidden items-center gap-2">
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 text-slate-600 hover:text-navy-950 hover:bg-slate-100 rounded-xl transition-colors"
+            className="p-2 text-navy hover:bg-slate-100 rounded-lg transition-colors"
             aria-label="Toggle Navigation Menu"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -201,7 +212,7 @@ const Navbar = ({ onOpenObservationModal }) => {
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-slate-200 bg-white px-4 pt-3 pb-6 space-y-1 shadow-xl animate-fade-in">
+        <div className="lg:hidden border-t border-slate-200 bg-white px-4 pt-3 pb-6 space-y-1 shadow-lg animate-fade-in">
           <NavLink
             to="/"
             onClick={() => setMobileMenuOpen(false)}
@@ -215,8 +226,8 @@ const Navbar = ({ onOpenObservationModal }) => {
             onClick={() => setMobileMenuOpen(false)}
             className={navLinkClass}
           >
-            <FileText className="w-4 h-4 text-blue-600" />
-            Certificates & Services
+            <FileText className="w-4 h-4 text-digital" />
+            Certificate Directory
           </NavLink>
           <NavLink
             to="/centre"
@@ -224,35 +235,35 @@ const Navbar = ({ onOpenObservationModal }) => {
             className={navLinkClass}
           >
             <Building2 className="w-4 h-4 text-slate-500" />
-            Find BSK Centre
+            Bangla Sahayata Kendra
           </NavLink>
           <NavLink
             to="/queue"
             onClick={() => setMobileMenuOpen(false)}
             className={navLinkClass}
           >
-            <Clock className="w-4 h-4 text-amber-500" />
-            <span>Queue Info (Coming Soon)</span>
+            <Clock className="w-4 h-4 text-saffron" />
+            <span>Queue Status (Coming Soon)</span>
           </NavLink>
           <NavLink
             to="/disclaimer"
             onClick={() => setMobileMenuOpen(false)}
             className={navLinkClass}
           >
-            About Us & Disclaimer
+            About & Disclaimer
           </NavLink>
 
           <div className="pt-3 mt-3 border-t border-slate-200">
             {isAuthenticated ? (
               <div className="space-y-2">
-                <div className="px-3 py-1.5 text-xs text-slate-600 bg-slate-50 rounded-xl">
-                  Signed in as <strong className="text-slate-800">{user?.full_name || user?.name}</strong> ({user?.role || 'Citizen'})
+                <div className="px-3 py-1.5 text-xs text-slate-700 bg-slate-50 rounded-lg">
+                  Signed in as <strong className="text-navy">{user?.full_name || user?.name}</strong> ({user?.role || 'Citizen'})
                 </div>
                 {isAdmin && (
                   <Link
                     to="/admin"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="block text-xs font-bold px-3.5 py-2.5 rounded-xl bg-navy-950 text-white"
+                    className="block text-xs font-bold px-3.5 py-2.5 rounded-lg bg-navy text-white"
                   >
                     Admin Portal
                   </Link>
@@ -261,7 +272,7 @@ const Navbar = ({ onOpenObservationModal }) => {
                   <Link
                     to="/observer"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="block text-xs font-bold px-3.5 py-2.5 rounded-xl bg-blue-600 text-white"
+                    className="block text-xs font-bold px-3.5 py-2.5 rounded-lg bg-digital text-white"
                   >
                     Observer Portal
                   </Link>
@@ -269,7 +280,7 @@ const Navbar = ({ onOpenObservationModal }) => {
                 <Link
                   to="/dashboard"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block text-xs font-bold px-3.5 py-2.5 rounded-xl bg-blue-50 text-blue-700"
+                  className="block text-xs font-bold px-3.5 py-2.5 rounded-lg bg-digital-50 text-digital border border-digital-200"
                 >
                   My Citizen Dashboard
                 </Link>
@@ -278,7 +289,7 @@ const Navbar = ({ onOpenObservationModal }) => {
                     setMobileMenuOpen(false);
                     handleLogout();
                   }}
-                  className="w-full text-left text-xs font-semibold px-3.5 py-2 text-rose-600 hover:bg-rose-50 rounded-xl"
+                  className="w-full text-left text-xs font-semibold px-3.5 py-2 text-rose-600 hover:bg-rose-50 rounded-lg"
                 >
                   Sign Out
                 </button>
@@ -288,14 +299,14 @@ const Navbar = ({ onOpenObservationModal }) => {
                 <Link
                   to="/login"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="text-center text-xs font-bold py-2.5 px-3 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50"
+                  className="text-center text-xs font-bold py-2.5 px-3 rounded-lg border border-slate-300 text-navy hover:bg-slate-50"
                 >
                   Sign In
                 </Link>
                 <Link
                   to="/register"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="text-center text-xs font-bold py-2.5 px-3 rounded-xl bg-blue-600 text-white hover:bg-blue-700"
+                  className="text-center text-xs font-bold py-2.5 px-3 rounded-lg bg-digital text-white hover:bg-digital-600"
                 >
                   Register
                 </Link>

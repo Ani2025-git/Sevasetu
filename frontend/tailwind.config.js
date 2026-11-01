@@ -7,39 +7,74 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Digital India Inspired Palette
         navy: {
-          950: '#060d17',
-          900: '#0a192f',
-          800: '#0f2744',
-          700: '#163259',
-          600: '#1e3a5f',
-          500: '#2c5282',
+          DEFAULT: '#173B72',
+          50: '#f0f4f9',
+          100: '#d9e2f0',
+          200: '#b8c9e3',
+          300: '#8da9d2',
+          400: '#5c84be',
+          500: '#3a66a7',
+          600: '#274e8c',
+          700: '#1d3e72',
+          800: '#173B72', // Primary Navy Blue
+          900: '#122e5a',
+          950: '#0b1c37',
         },
-        royal: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
+        digital: {
+          DEFAULT: '#2878C8',
+          50: '#eff6fc',
+          100: '#dbebf9',
+          200: '#bdddf5',
+          300: '#8ec5ee',
+          400: '#58a7e3',
+          500: '#2878C8', // Digital Blue
+          600: '#2166af',
+          700: '#1b528f',
+          800: '#184474',
+          900: '#183a60',
         },
+        saffron: {
+          DEFAULT: '#F39A32',
+          50: '#fef8f0',
+          100: '#fdeddb',
+          200: '#fbd7b5',
+          300: '#f7bc86',
+          400: '#f4a156',
+          500: '#F39A32', // Saffron Accent
+          600: '#de7a20',
+          700: '#b85e19',
+          800: '#934a1a',
+          900: '#773e19',
+        },
+        indiaGreen: {
+          DEFAULT: '#16865B',
+          50: '#edf8f3',
+          100: '#d4efe1',
+          200: '#aee0c8',
+          300: '#7dcaba',
+          400: '#4daea2',
+          500: '#16865B', // Green Accent
+          600: '#106f4b',
+          700: '#0f583e',
+          800: '#104733',
+          900: '#0f3a2b',
+        },
+        surface: '#F5F7FA', // Light Background
         queue: {
-          low: '#10b981', // green
-          moderate: '#f59e0b', // amber
-          high: '#ef4444', // red
-          unknown: '#6b7280', // grey
+          low: '#16865B',
+          moderate: '#F39A32',
+          high: '#E53E3E',
+          unknown: '#64748B',
         }
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
       },
       animation: {
-        'fade-in': 'fadeIn 0.25s ease-out forwards',
-        'slide-up': 'slideUp 0.3s ease-out forwards',
+        'fade-in': 'fadeIn 0.2s ease-out forwards',
+        'slide-up': 'slideUp 0.25s ease-out forwards',
       },
       keyframes: {
         fadeIn: {
@@ -47,7 +82,7 @@ export default {
           '100%': { opacity: '1' },
         },
         slideUp: {
-          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '0%': { opacity: '0', transform: 'translateY(8px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
       },

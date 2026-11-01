@@ -322,10 +322,10 @@ const AdminDashboard = () => {
       )}
 
       {/* Admin Top Header */}
-      <div className="bg-navy-900 text-white rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm">
+      <div className="bg-navy text-white rounded-xl p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border border-navy-700">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="bg-emerald-400 text-slate-900 text-[10px] font-bold uppercase px-2 py-0.5 rounded tracking-wider">
+            <span className="bg-saffron text-navy text-[10px] font-bold uppercase px-2 py-0.5 rounded tracking-wider">
               Administration Portal
             </span>
             <span className="text-xs text-slate-300">Bangla Sahayata Kendra Pilot</span>
@@ -366,9 +366,9 @@ const AdminDashboard = () => {
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all ${isActive
-                      ? 'bg-navy-900 text-white shadow-sm'
-                      : 'text-slate-600 hover:text-navy-900 hover:bg-slate-100'
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold transition-all ${isActive
+                      ? 'bg-navy text-white shadow-xs'
+                      : 'text-slate-600 hover:text-navy hover:bg-slate-100'
                     }`}
                 >
                   <div className="flex items-center gap-2.5">
@@ -484,7 +484,7 @@ const AdminDashboard = () => {
                             supporting_observations: 2,
                           });
                         }}
-                        className="w-full py-2.5 px-4 bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-2 shadow-sm"
+                        className="w-full py-2.5 px-4 bg-digital hover:bg-digital-600 text-white text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-2 shadow-xs"
                       >
                         <Clock className="w-4 h-4" /> Publish Live Queue Status
                       </button>
@@ -580,7 +580,7 @@ const AdminDashboard = () => {
                       },
                     });
                   }}
-                  className="px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5 shadow-sm"
+                  className="px-4 py-2 bg-digital hover:bg-digital-600 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5 shadow-xs"
                 >
                   <Plus className="w-4 h-4" /> Add Centre
                 </button>
@@ -665,7 +665,7 @@ const AdminDashboard = () => {
                       },
                     });
                   }}
-                  className="px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5 shadow-sm"
+                  className="px-4 py-2 bg-digital hover:bg-digital-600 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5 shadow-xs"
                 >
                   <Plus className="w-4 h-4" /> Add Service
                 </button>
@@ -830,7 +830,7 @@ const AdminDashboard = () => {
                 <div className="pt-2">
                   <button
                     type="submit"
-                    className="py-3 px-6 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-colors shadow-md flex items-center gap-2"
+                    className="py-3 px-6 bg-digital hover:bg-digital-600 text-white font-bold text-xs uppercase tracking-wider rounded-lg transition-colors shadow-xs flex items-center gap-2"
                   >
                     <Send className="w-4 h-4" /> Publish to Public Portal
                   </button>
@@ -971,7 +971,7 @@ const AdminDashboard = () => {
                       data: { name: '', email: '', password: '', role: 'observer' },
                     });
                   }}
-                  className="px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5 shadow-sm"
+                  className="px-4 py-2 bg-digital hover:bg-digital-600 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5 shadow-xs"
                 >
                   <Plus className="w-4 h-4" /> Add Observer
                 </button>
@@ -1125,7 +1125,7 @@ const AdminDashboard = () => {
       {centreModal.isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy-900/60 backdrop-blur-sm animate-fadeIn">
           <div className="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden">
-            <div className="bg-navy-900 text-white p-6 flex items-center justify-between">
+            <div className="bg-navy text-white p-6 flex items-center justify-between">
               <h3 className="font-bold text-base">
                 {centreModal.data?.id ? 'Edit Centre Details' : 'Add New BSK Centre'}
               </h3>
@@ -1228,7 +1228,7 @@ const AdminDashboard = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs rounded-lg shadow-sm"
+                  className="px-5 py-2 bg-digital hover:bg-digital-600 text-white font-bold text-xs rounded-lg shadow-xs"
                 >
                   Save Centre
                 </button>
@@ -1242,7 +1242,7 @@ const AdminDashboard = () => {
       {serviceModal.isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy-900/60 backdrop-blur-sm animate-fadeIn">
           <div className="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden">
-            <div className="bg-navy-900 text-white p-6 flex items-center justify-between">
+            <div className="bg-navy text-white p-6 flex items-center justify-between">
               <h3 className="font-bold text-base">
                 {serviceModal.data?.id ? 'Edit Service' : 'Add Government Service'}
               </h3>
@@ -1404,7 +1404,7 @@ const AdminDashboard = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs rounded-lg shadow-sm"
+                  className="px-5 py-2 bg-digital hover:bg-digital-600 text-white font-bold text-xs rounded-lg shadow-xs"
                 >
                   Save Service
                 </button>
@@ -1418,7 +1418,7 @@ const AdminDashboard = () => {
       {userModal.isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy-900/60 backdrop-blur-sm animate-fadeIn">
           <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden">
-            <div className="bg-navy-900 text-white p-6 flex items-center justify-between">
+            <div className="bg-navy text-white p-6 flex items-center justify-between">
               <h3 className="font-bold text-base">Add New Staff Account</h3>
               <button
                 onClick={() => setUserModal({ isOpen: false, data: null })}
@@ -1486,7 +1486,7 @@ const AdminDashboard = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs rounded-lg shadow-sm"
+                  className="px-5 py-2 bg-digital hover:bg-digital-600 text-white font-bold text-xs rounded-lg shadow-xs"
                 >
                   Create Account
                 </button>

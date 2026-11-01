@@ -9,7 +9,7 @@ import {
   AlertCircle, 
   ArrowRight,
   ShieldCheck,
-  Building2
+  Landmark
 } from 'lucide-react';
 
 const RegisterPage = () => {
@@ -36,7 +36,6 @@ const RegisterPage = () => {
     e.preventDefault();
     setError('');
 
-    // Validation
     if (!formData.fullName.trim()) {
       setError('Please enter your full name.');
       return;
@@ -84,23 +83,23 @@ const RegisterPage = () => {
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
-      <div className="max-w-md w-full bg-white rounded-3xl border border-slate-200 shadow-xl p-8 space-y-6">
+      <div className="max-w-md w-full bg-white rounded-xl border border-slate-200 shadow-xs p-8 space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 mb-1">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-navy text-saffron mb-1 border border-navy-700">
             <User className="w-6 h-6" />
           </div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-2xl font-black text-navy tracking-tight">
             Create Citizen Account
           </h1>
           <p className="text-xs text-slate-500">
-            Join Seva Setu to bookmark West Bengal certificate services and save your document checklists.
+            Join Seva Setu to save certificate checklists and track your preparation progress.
           </p>
         </div>
 
         {/* Error message */}
         {error && (
-          <div className="bg-rose-50 border border-rose-200 rounded-xl p-3.5 flex items-start gap-2.5 text-xs text-rose-700">
+          <div className="bg-rose-50 border border-rose-200 rounded-lg p-3 flex items-start gap-2.5 text-xs text-rose-700">
             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600" />
             <span>{error}</span>
           </div>
@@ -108,8 +107,8 @@ const RegisterPage = () => {
 
         {/* Success message */}
         {success && (
-          <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 flex items-center gap-2.5 text-xs text-emerald-700 font-medium">
-            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+          <div className="bg-indiaGreen-50 border border-indiaGreen-200 rounded-lg p-3 flex items-center gap-2.5 text-xs text-indiaGreen font-medium">
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-indiaGreen" />
             <span>{success}</span>
           </div>
         )}
@@ -129,7 +128,7 @@ const RegisterPage = () => {
                 value={formData.fullName}
                 onChange={handleChange}
                 placeholder="e.g. Subhashish Roy"
-                className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800"
+                className="w-full pl-10 pr-3.5 py-2.5 rounded-lg border border-slate-300 text-xs sm:text-sm focus:outline-none focus:border-digital text-navy"
               />
             </div>
           </div>
@@ -147,7 +146,7 @@ const RegisterPage = () => {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="citizen@example.com"
-                className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800"
+                className="w-full pl-10 pr-3.5 py-2.5 rounded-lg border border-slate-300 text-xs sm:text-sm focus:outline-none focus:border-digital text-navy"
               />
             </div>
           </div>
@@ -166,7 +165,7 @@ const RegisterPage = () => {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="At least 6 characters"
-                className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800"
+                className="w-full pl-10 pr-3.5 py-2.5 rounded-lg border border-slate-300 text-xs sm:text-sm focus:outline-none focus:border-digital text-navy"
               />
             </div>
           </div>
@@ -185,7 +184,7 @@ const RegisterPage = () => {
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 placeholder="Re-enter your password"
-                className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800"
+                className="w-full pl-10 pr-3.5 py-2.5 rounded-lg border border-slate-300 text-xs sm:text-sm focus:outline-none focus:border-digital text-navy"
               />
             </div>
           </div>
@@ -193,13 +192,13 @@ const RegisterPage = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full inline-flex items-center justify-center gap-2 bg-navy-900 hover:bg-navy-800 text-white text-xs sm:text-sm font-bold py-3 rounded-xl transition-all shadow-md shadow-navy-900/20 disabled:opacity-50"
+            className="w-full inline-flex items-center justify-center gap-2 bg-digital hover:bg-digital-600 text-white text-xs sm:text-sm font-bold py-2.5 rounded-lg transition-colors shadow-xs disabled:opacity-50"
           >
             {loading ? (
-              <span>Creating Account...</span>
+              <span>Creating Citizen Account...</span>
             ) : (
               <>
-                <span>Register as Citizen</span>
+                <span>Register Account</span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}
@@ -207,17 +206,17 @@ const RegisterPage = () => {
         </form>
 
         {/* Privacy Note */}
-        <div className="flex items-start gap-2 bg-slate-50 p-3 rounded-xl border border-slate-100 text-[11px] text-slate-500">
-          <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+        <div className="flex items-start gap-2 bg-surface p-3 rounded-lg border border-slate-200 text-[11px] text-slate-600">
+          <ShieldCheck className="w-4 h-4 text-indiaGreen shrink-0 mt-0.5" />
           <span>
-            We respect citizen privacy. We never ask for Aadhaar numbers, phone OTPs, or financial information.
+            Citizen privacy pledge: We never collect Aadhaar numbers, phone OTPs, or financial information.
           </span>
         </div>
 
         {/* Link to login */}
         <div className="text-center text-xs text-slate-600 pt-2 border-t border-slate-100">
           Already have an account?{' '}
-          <Link to="/login" className="text-blue-600 font-bold hover:underline">
+          <Link to="/login" className="text-digital font-bold hover:underline">
             Sign In here
           </Link>
         </div>
@@ -227,4 +226,3 @@ const RegisterPage = () => {
 };
 
 export default RegisterPage;
-

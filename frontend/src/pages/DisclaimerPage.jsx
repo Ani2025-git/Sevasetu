@@ -6,11 +6,11 @@ const DisclaimerPage = () => {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
       {/* Title */}
       <div className="space-y-3 text-center sm:text-left">
-        <div className="inline-flex items-center gap-2 bg-amber-100 text-amber-900 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-          <ShieldAlert className="w-4 h-4 text-amber-600" />
+        <div className="inline-flex items-center gap-2 bg-saffron text-navy px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+          <ShieldAlert className="w-4 h-4" />
           <span>Independent Citizen Assistance Platform</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+        <h1 className="text-3xl sm:text-4xl font-black text-navy tracking-tight">
           Platform Charter, Legal Disclaimer & Privacy Policy
         </h1>
         <p className="text-xs sm:text-sm text-slate-500">
@@ -19,16 +19,16 @@ const DisclaimerPage = () => {
       </div>
 
       {/* Primary Legal Disclaimer Card */}
-      <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-sm space-y-4">
-        <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-          <ShieldAlert className="w-5 h-5 text-amber-600" />
+      <div className="bg-white rounded-xl border border-slate-200 p-6 sm:p-8 space-y-4">
+        <h2 className="text-lg font-bold text-navy flex items-center gap-2">
+          <ShieldAlert className="w-5 h-5 text-saffron" />
           1. Independent Technological Demonstration
         </h2>
         <div className="text-xs sm:text-sm text-slate-600 space-y-3 leading-relaxed">
           <p>
             <strong>Seva Setu ("Platform")</strong> is an independent civic information platform and citizen assistance guide.
           </p>
-          <div className="p-4 bg-amber-50 rounded-2xl border border-amber-200 text-amber-950 font-medium">
+          <div className="p-4 bg-saffron-50 rounded-lg border border-saffron-200 text-saffron-950 font-medium">
             IMPORTANT: Seva Setu is NOT officially affiliated with, authorized by, sponsored by, or operated by the Government of West Bengal, the Department of Personnel and Administrative Reforms (P&AR), or any official Bangla Sahayata Kendra (BSK).
           </div>
           <p>
@@ -40,18 +40,18 @@ const DisclaimerPage = () => {
               href="https://bsk.wb.gov.in"
               target="_blank"
               rel="noreferrer"
-              className="text-blue-700 underline font-semibold inline-flex items-center gap-1"
+              className="text-digital underline font-semibold inline-flex items-center gap-1"
             >
-              https://bsk.wb.gov.in <ExternalLink className="w-3 h-3" />
+              https://bsk.wb.gov.in <ExternalLink className="w-3 h-3 text-digital" />
             </a>.
           </p>
         </div>
       </div>
 
       {/* Queue Model & Waiting Times Disclaimer */}
-      <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-sm space-y-4">
-        <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-          <Info className="w-5 h-5 text-blue-600" />
+      <div className="bg-white rounded-xl border border-slate-200 p-6 sm:p-8 space-y-4">
+        <h2 className="text-lg font-bold text-navy flex items-center gap-2">
+          <Info className="w-5 h-5 text-digital" />
           2. Queue Intelligence & Waiting Time Boundaries
         </h2>
         <div className="text-xs sm:text-sm text-slate-600 space-y-3 leading-relaxed">
@@ -67,9 +67,9 @@ const DisclaimerPage = () => {
       </div>
 
       {/* Privacy Policy & Zero Citizen PII Storage */}
-      <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-sm space-y-4">
-        <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-          <Lock className="w-5 h-5 text-emerald-600" />
+      <div className="bg-white rounded-xl border border-slate-200 p-6 sm:p-8 space-y-4">
+        <h2 className="text-lg font-bold text-navy flex items-center gap-2">
+          <Lock className="w-5 h-5 text-indiaGreen" />
           3. Privacy Policy & Zero Citizen Document Storage
         </h2>
         <div className="text-xs sm:text-sm text-slate-600 space-y-3 leading-relaxed">

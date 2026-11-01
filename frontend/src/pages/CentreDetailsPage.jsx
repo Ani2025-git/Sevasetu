@@ -9,11 +9,9 @@ import {
   ExternalLink, 
   FileText, 
   CheckCircle2, 
-  PlusCircle, 
   ShieldCheck, 
   AlertCircle,
   HelpCircle,
-  Navigation,
   ArrowRight,
   Info
 } from 'lucide-react';
@@ -68,8 +66,8 @@ const CentreDetailsPage = ({ onOpenObservationModal }) => {
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-16 text-center">
-        <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-        <p className="text-xs text-slate-500 font-medium">Loading centre data...</p>
+        <div className="w-8 h-8 border-4 border-digital border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+        <p className="text-xs text-slate-500 font-medium">Loading centre information...</p>
       </div>
     );
   }
@@ -79,16 +77,16 @@ const CentreDetailsPage = ({ onOpenObservationModal }) => {
       {/* Centre Switcher Tabs (if more than 1 centre) */}
       {centres.length > 1 && (
         <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-200">
-          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-2">
-            Select Centre:
+          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider shrink-0 mr-2">
+            Select BSK Centre:
           </span>
           {centres.map((c) => (
             <button
               key={c.id}
               onClick={() => handleSelectCentre(c)}
-              className={`px-3.5 py-2 rounded-xl text-xs font-semibold shrink-0 transition-all ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold shrink-0 transition-colors ${
                 selectedCentre?.id === c.id
-                  ? 'bg-navy-950 text-white shadow-xs'
+                  ? 'bg-navy text-white shadow-2xs'
                   : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
               }`}
             >
@@ -99,51 +97,51 @@ const CentreDetailsPage = ({ onOpenObservationModal }) => {
       )}
 
       {/* Main Centre Hero Card */}
-      <div className="bg-white rounded-3xl shadow-sm border border-slate-200/90 p-6 sm:p-8 space-y-6">
+      <div className="bg-white rounded-xl shadow-xs border border-slate-200 p-6 sm:p-8 space-y-6">
         <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6 pb-6 border-b border-slate-100">
           <div className="space-y-3 max-w-2xl">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="bg-blue-50 text-blue-700 border border-blue-200 text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-md tracking-wider">
+              <span className="bg-digital-50 text-digital border border-digital-200 text-[11px] font-bold uppercase px-2.5 py-0.5 rounded tracking-wider">
                 {selectedCentre?.centre_type || 'Bangla Sahayata Kendra'}
               </span>
-              <span className="bg-slate-100 text-slate-700 text-[11px] font-semibold px-2.5 py-0.5 rounded-md">
+              <span className="bg-surface text-slate-700 text-[11px] font-semibold px-2.5 py-0.5 rounded border border-slate-200">
                 District: {selectedCentre?.district}
               </span>
-              <span className="bg-slate-100 text-slate-700 text-[11px] font-semibold px-2.5 py-0.5 rounded-md">
+              <span className="bg-surface text-slate-700 text-[11px] font-semibold px-2.5 py-0.5 rounded border border-slate-200">
                 Block: {selectedCentre?.block || 'Urban / SDO'}
               </span>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-navy tracking-tight">
               {selectedCentre?.name}
             </h1>
 
             <p className="text-xs sm:text-sm text-slate-600 flex items-start gap-2">
-              <MapPin className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+              <MapPin className="w-4 h-4 text-saffron shrink-0 mt-0.5" />
               <span>{selectedCentre?.address}</span>
             </p>
           </div>
 
-          {/* Queue & Action column */}
-          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 shrink-0 flex flex-col justify-between space-y-3 min-w-[280px]">
+          {/* Queue & Roadmap Status Box */}
+          <div className="bg-surface border border-slate-200 rounded-lg p-5 shrink-0 flex flex-col justify-between space-y-3 min-w-[280px]">
             <div>
               <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center justify-between">
-                <span>Queue Monitoring</span>
-                <span className="text-amber-600 font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                <span>Queue Tracking</span>
+                <span className="text-saffron-800 font-bold bg-saffron-50 px-2 py-0.5 rounded border border-saffron-200">
                   Coming Soon
                 </span>
               </p>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Live queue intelligence is in pilot calibration for this location. No simulated wait times are shown.
+                Live queue intelligence is in pilot observer calibration. In adherence to transparency, no fake wait times are shown.
               </p>
             </div>
 
-            <div className="pt-2 border-t border-slate-200/80 space-y-2">
+            <div className="pt-2 border-t border-slate-200 space-y-2">
               <Link
                 to="/queue"
-                className="w-full py-2.5 px-3 bg-navy-950 hover:bg-navy-900 text-white text-xs font-semibold rounded-xl transition-colors flex items-center justify-center gap-1.5 shadow-sm"
+                className="w-full py-2.5 px-3 bg-navy hover:bg-navy-900 text-white text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow-2xs"
               >
-                <Clock className="w-3.5 h-3.5 text-blue-400" />
+                <Clock className="w-3.5 h-3.5 text-saffron" />
                 Queue Pilot Roadmap
               </Link>
             </div>
@@ -152,32 +150,32 @@ const CentreDetailsPage = ({ onOpenObservationModal }) => {
 
         {/* Info Grid (Hours, Holidays, Operator Count) */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
-            <div className="flex items-center gap-1.5 text-slate-500 text-xs font-semibold">
-              <Clock className="w-4 h-4 text-blue-600" />
+          <div className="p-4 rounded-lg bg-surface border border-slate-200 space-y-1">
+            <div className="flex items-center gap-1.5 text-slate-600 text-xs font-semibold">
+              <Clock className="w-4 h-4 text-digital" />
               Published Operating Hours
             </div>
-            <p className="text-xs sm:text-sm font-bold text-slate-800">
+            <p className="text-xs sm:text-sm font-bold text-navy">
               {selectedCentre?.operating_hours || '10:00 AM – 5:00 PM (Monday – Saturday)'}
             </p>
           </div>
 
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
-            <div className="flex items-center gap-1.5 text-slate-500 text-xs font-semibold">
-              <Calendar className="w-4 h-4 text-indigo-600" />
-              Notified Holidays & Weekly Off
+          <div className="p-4 rounded-lg bg-surface border border-slate-200 space-y-1">
+            <div className="flex items-center gap-1.5 text-slate-600 text-xs font-semibold">
+              <Calendar className="w-4 h-4 text-saffron" />
+              Notified Weekly Off & Holidays
             </div>
-            <p className="text-xs sm:text-sm font-bold text-slate-800">
+            <p className="text-xs sm:text-sm font-bold text-navy">
               {selectedCentre?.holidays || 'Sundays and West Bengal Gazetted Holidays'}
             </p>
           </div>
 
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
-            <div className="flex items-center gap-1.5 text-slate-500 text-xs font-semibold">
-              <Building2 className="w-4 h-4 text-emerald-600" />
-              Assistance Policy
+          <div className="p-4 rounded-lg bg-surface border border-slate-200 space-y-1">
+            <div className="flex items-center gap-1.5 text-slate-600 text-xs font-semibold">
+              <Building2 className="w-4 h-4 text-indiaGreen" />
+              Service Fee Policy
             </div>
-            <p className="text-xs sm:text-sm font-bold text-emerald-700">
+            <p className="text-xs sm:text-sm font-bold text-indiaGreen">
               100% Free Service by BSK Operators
             </p>
           </div>
@@ -188,17 +186,17 @@ const CentreDetailsPage = ({ onOpenObservationModal }) => {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-blue-600" />
+            <h2 className="text-xl font-bold text-navy flex items-center gap-2">
+              <FileText className="w-5 h-5 text-digital" />
               Government Services Assisted at this Centre
             </h2>
             <p className="text-xs text-slate-500">
-              Review mandatory document checklists before visiting the counter
+              Verify required documents checklist before visiting the counter
             </p>
           </div>
           <Link
             to="/services"
-            className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1"
+            className="text-xs font-bold text-digital hover:text-navy flex items-center gap-1"
           >
             All Services Directory <ArrowRight className="w-3.5 h-3.5" />
           </Link>
@@ -208,13 +206,13 @@ const CentreDetailsPage = ({ onOpenObservationModal }) => {
           {services.map((s) => (
             <div
               key={s.id}
-              className="bg-white p-6 rounded-3xl border border-slate-200/90 hover:border-blue-400 hover:shadow-lg transition-all duration-200 flex flex-col justify-between space-y-4"
+              className="bg-white p-6 rounded-xl border border-slate-200 hover:border-digital transition-colors flex flex-col justify-between space-y-4"
             >
               <div className="space-y-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200/60">
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-digital-50 text-digital border border-digital-200">
                   {s.category || 'Certificate'}
                 </span>
-                <h3 className="text-base font-bold text-slate-900 line-clamp-1">{s.name}</h3>
+                <h3 className="text-base font-bold text-navy line-clamp-1">{s.name}</h3>
                 <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">{s.description}</p>
               </div>
 
@@ -224,7 +222,7 @@ const CentreDetailsPage = ({ onOpenObservationModal }) => {
                 </span>
                 <Link
                   to={`/services/${s.id}`}
-                  className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-800"
+                  className="inline-flex items-center gap-1 text-xs font-bold text-digital hover:text-navy"
                 >
                   Document Checklist <ChevronRight className="w-3.5 h-3.5" />
                 </Link>
