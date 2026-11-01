@@ -8,17 +8,12 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand & Description */}
           <div className="md:col-span-2 space-y-3">
-            <Link to="/" className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-[#173B72] flex items-center justify-center text-white shadow-xs">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-[#F39A32]">
-                  <path d="M4 19V9a8 8 0 0 1 16 0v10" />
-                  <path d="M4 14h16" />
-                  <path d="M12 9v10" />
-                </svg>
-              </div>
-              <span className="text-lg font-bold tracking-tight text-[#173B72]">
-                Seva <span className="text-[#F39A32]">Setu</span>
-              </span>
+            <Link to="/" className="inline-block">
+              <img
+                src="/assets/brand/seva-setu-logo.png"
+                alt="Seva Setu Logo"
+                className="h-10 sm:h-12 w-auto object-contain"
+              />
             </Link>
             <p className="text-sm text-slate-600 max-w-md leading-relaxed">
               An independent civic platform designed to help West Bengal citizens understand government certificate procedures, prepare required documents, and access official application portals directly.

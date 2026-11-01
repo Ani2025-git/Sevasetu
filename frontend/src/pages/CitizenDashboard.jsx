@@ -132,8 +132,12 @@ const CitizenDashboard = () => {
       <div className="bg-navy text-white rounded-xl p-6 sm:p-8 border border-navy-700">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-lg bg-white/10 flex items-center justify-center text-saffron border border-white/20 font-black text-2xl">
-              {user?.full_name ? user.full_name.charAt(0).toUpperCase() : (user?.name?.charAt(0) || 'C')}
+            <div className="w-14 h-14 rounded-xl bg-white p-1 flex items-center justify-center shrink-0 shadow-sm border border-slate-200">
+              <img
+                src="/assets/brand/seva-setu-symbol.png"
+                alt="Seva Setu Logo"
+                className="w-full h-full object-contain"
+              />
             </div>
             <div>
               <div className="inline-flex items-center gap-1.5 text-xs font-bold text-saffron uppercase tracking-wider">

@@ -323,19 +323,28 @@ const AdminDashboard = () => {
 
       {/* Admin Top Header */}
       <div className="bg-navy text-white rounded-xl p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border border-navy-700">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="bg-saffron text-navy text-[10px] font-bold uppercase px-2 py-0.5 rounded tracking-wider">
-              Administration Portal
-            </span>
-            <span className="text-xs text-slate-300">Bangla Sahayata Kendra Pilot</span>
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-xl bg-white p-1 flex items-center justify-center shrink-0 shadow-sm border border-slate-200">
+            <img
+              src="/assets/brand/seva-setu-symbol.png"
+              alt="Seva Setu Logo"
+              className="w-full h-full object-contain"
+            />
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-            Seva Setu Operations & Governance
-          </h1>
-          <p className="text-xs text-slate-300">
-            Signed in as <strong>{user?.name}</strong> ({user?.email}) • Administrator Privileges Active
-          </p>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="bg-saffron text-navy text-[10px] font-bold uppercase px-2 py-0.5 rounded tracking-wider">
+                Administration Portal
+              </span>
+              <span className="text-xs text-slate-300">Bangla Sahayata Kendra Pilot</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+              Seva Setu Operations & Governance
+            </h1>
+            <p className="text-xs text-slate-300">
+              Signed in as <strong>{user?.name}</strong> ({user?.email}) • Administrator Privileges Active
+            </p>
+          </div>
         </div>
 
         <div className="flex items-center gap-3">
@@ -357,7 +366,14 @@ const AdminDashboard = () => {
       {/* Main Layout: Sidebar & Content Area */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Sidebar Nav (3 cols) */}
-        <div className="lg:col-span-3 space-y-2">
+        <div className="lg:col-span-3 space-y-3">
+          <div className="bg-white rounded-2xl border border-slate-200 p-3 shadow-sm flex items-center justify-center">
+            <img
+              src="/assets/brand/seva-setu-logo.png"
+              alt="Seva Setu Logo"
+              className="h-10 w-auto object-contain"
+            />
+          </div>
           <div className="bg-white rounded-2xl border border-slate-200 p-3 shadow-sm space-y-1">
             {navItems.map((item) => {
               const Icon = item.icon;

@@ -114,19 +114,28 @@ const ObserverDashboard = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Header Banner */}
       <div className="bg-navy text-white rounded-xl p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border border-navy-700">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="bg-saffron text-navy text-[10px] font-bold uppercase px-2 py-0.5 rounded tracking-wider">
-              Field Observer Portal
-            </span>
-            <span className="text-xs text-slate-300">Independent Pilot Protocol</span>
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-xl bg-white p-1 flex items-center justify-center shrink-0 shadow-sm border border-slate-200">
+            <img
+              src="/assets/brand/seva-setu-symbol.png"
+              alt="Seva Setu Logo"
+              className="w-full h-full object-contain"
+            />
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-            Observer Dashboard — {user?.name}
-          </h1>
-          <p className="text-xs text-slate-300">
-            Submit verified on-site crowd observations. All submissions require administrator sign-off before publication.
-          </p>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="bg-saffron text-navy text-[10px] font-bold uppercase px-2 py-0.5 rounded tracking-wider">
+                Field Observer Portal
+              </span>
+              <span className="text-xs text-slate-300">Independent Pilot Protocol</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+              Observer Dashboard — {user?.name}
+            </h1>
+            <p className="text-xs text-slate-300">
+              Submit verified on-site crowd observations. All submissions require administrator sign-off before publication.
+            </p>
+          </div>
         </div>
 
         <div className="bg-white/10 px-4 py-2.5 rounded-2xl border border-white/20 text-xs shrink-0">

@@ -22,19 +22,14 @@ const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-slate-200/90 shadow-xs">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        {/* Seva Setu Custom Logo */}
-        <Link to="/" className="flex items-center gap-2.5 group">
-          <div className="w-9 h-9 rounded-lg bg-[#173B72] flex items-center justify-center text-white shadow-xs group-hover:bg-[#2878C8] transition-colors">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-[#F39A32]">
-              <path d="M4 19V9a8 8 0 0 1 16 0v10" />
-              <path d="M4 14h16" />
-              <path d="M12 9v10" />
-            </svg>
-          </div>
-          <span className="text-xl font-bold tracking-tight text-[#173B72]">
-            Seva <span className="text-[#F39A32]">Setu</span>
-          </span>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-[72px] flex items-center justify-between">
+        {/* Seva Setu Official Logo */}
+        <Link to="/" className="flex items-center group py-1">
+          <img
+            src="/assets/brand/seva-setu-logo.png"
+            alt="Seva Setu Logo"
+            className="h-10 sm:h-[52px] w-auto object-contain transition-opacity hover:opacity-95"
+          />
         </Link>
 
         {/* Desktop Navigation Links */}

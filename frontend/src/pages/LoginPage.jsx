@@ -65,13 +65,17 @@ const LoginPage = () => {
   return (
     <div className="max-w-md mx-auto px-4 py-16 space-y-6">
       {/* Brand Header */}
-      <div className="text-center space-y-2">
-        <div className="w-12 h-12 bg-navy rounded-xl flex items-center justify-center text-saffron mx-auto shadow-sm border border-navy-700">
-          <Landmark className="w-6 h-6 text-saffron" />
-        </div>
-        <h1 className="text-2xl font-black text-navy tracking-tight">Sign In to Seva Setu</h1>
-        <p className="text-xs text-slate-500">
-          Access your citizen saved checklists, observer reports, or administration panel.
+      <div className="text-center space-y-3">
+        <Link to="/" className="inline-block">
+          <img
+            src="/assets/brand/seva-setu-logo.png"
+            alt="Seva Setu Logo"
+            className="h-14 w-auto mx-auto object-contain"
+          />
+        </Link>
+        <h1 className="text-xl font-bold text-[#173B72]">Sign In to Your Account</h1>
+        <p className="text-xs text-slate-500 max-w-xs mx-auto">
+          Access your saved checklists, observer reports, or administration panel.
         </p>
       </div>
 
