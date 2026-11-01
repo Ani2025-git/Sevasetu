@@ -1,7 +1,17 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { ShieldCheck, Lock, Mail, AlertCircle, ArrowRight, UserCheck, KeyRound } from 'lucide-react';
+import { 
+  ShieldCheck, 
+  Lock, 
+  Mail, 
+  AlertCircle, 
+  ArrowRight, 
+  UserCheck, 
+  KeyRound, 
+  User,
+  Landmark
+} from 'lucide-react';
 
 const LoginPage = () => {
   const { login } = useAuth();
@@ -29,7 +39,7 @@ const LoginPage = () => {
         } else if (data.user.role === 'observer') {
           navigate('/observer');
         } else {
-          navigate('/');
+          navigate('/dashboard');
         }
       }
     } catch (err) {
@@ -41,35 +51,39 @@ const LoginPage = () => {
 
   const fillDemoCredentials = (role) => {
     if (role === 'admin') {
-      setEmail('admin@sevaqueue.org');
+      setEmail('admin@sevasetu.org');
       setPassword('Admin@123');
-    } else {
-      setEmail('observer@sevaqueue.org');
+    } else if (role === 'observer') {
+      setEmail('observer@sevasetu.org');
       setPassword('Observer@123');
+    } else {
+      setEmail('citizen@sevasetu.org');
+      setPassword('Citizen@123');
     }
   };
 
   return (
     <div className="max-w-md mx-auto px-4 py-16 space-y-6">
+      {/* Brand Header */}
       <div className="text-center space-y-2">
-        <div className="w-12 h-12 bg-navy-900 rounded-2xl flex items-center justify-center text-white mx-auto shadow-lg">
-          <Lock className="w-6 h-6" />
+        <div className="w-12 h-12 bg-navy-950 rounded-2xl flex items-center justify-center text-blue-400 mx-auto shadow-lg border border-blue-900/50">
+          <Landmark className="w-6 h-6" />
         </div>
-        <h1 className="text-2xl font-bold text-navy-900">Staff & Observer Sign In</h1>
+        <h1 className="text-2xl font-black text-slate-900 tracking-tight">Sign In to Seva Setu</h1>
         <p className="text-xs text-slate-500">
-          Authorized access for field observers and centre administrators.
+          Access your citizen saved checklists, observer field updates, or administration portal.
         </p>
       </div>
 
       {isExpired && (
-        <div className="p-3 bg-amber-50 border border-amber-200 text-amber-900 text-xs rounded-xl flex items-center gap-2">
+        <div className="p-3.5 bg-amber-50 border border-amber-200 text-amber-900 text-xs rounded-xl flex items-center gap-2">
           <AlertCircle className="w-4 h-4 text-amber-700 shrink-0" />
-          <span>Your session has expired. Please log in again to continue.</span>
+          <span>Your session has expired. Please sign in again to continue.</span>
         </div>
       )}
 
       {error && (
-        <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-xl flex items-center gap-2">
+        <div className="p-3.5 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-xl flex items-center gap-2">
           <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
           <span>{error}</span>
         </div>
@@ -81,27 +95,38 @@ const LoginPage = () => {
           <KeyRound className="w-3.5 h-3.5 text-blue-600" />
           Quick Demo Credentials (One Click Fill)
         </p>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-3 gap-2">
+          <button
+            type="button"
+            onClick={() => fillDemoCredentials('citizen')}
+            className="p-2 rounded-xl bg-white border border-slate-300 hover:border-blue-500 hover:bg-blue-50 text-left text-xs transition-all shadow-sm group"
+          >
+            <p className="font-bold text-navy-900 group-hover:text-blue-700 flex items-center gap-1 text-[11px]">
+              <User className="w-3 h-3 text-blue-600" /> Citizen
+            </p>
+            <p className="text-[9px] text-slate-400 mt-0.5 truncate">citizen@sevasetu.org</p>
+          </button>
+
           <button
             type="button"
             onClick={() => fillDemoCredentials('admin')}
-            className="p-2.5 rounded-xl bg-white border border-slate-300 hover:border-blue-500 hover:bg-blue-50 text-left text-xs transition-all shadow-sm group"
+            className="p-2 rounded-xl bg-white border border-slate-300 hover:border-blue-500 hover:bg-blue-50 text-left text-xs transition-all shadow-sm group"
           >
-            <p className="font-bold text-navy-900 group-hover:text-blue-700 flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5 text-blue-600" /> Admin Role
+            <p className="font-bold text-navy-900 group-hover:text-blue-700 flex items-center gap-1 text-[11px]">
+              <ShieldCheck className="w-3 h-3 text-indigo-600" /> Admin
             </p>
-            <p className="text-[10px] text-slate-500 mt-0.5 font-mono">admin@sevaqueue.org</p>
+            <p className="text-[9px] text-slate-400 mt-0.5 truncate">admin@sevasetu.org</p>
           </button>
 
           <button
             type="button"
             onClick={() => fillDemoCredentials('observer')}
-            className="p-2.5 rounded-xl bg-white border border-slate-300 hover:border-blue-500 hover:bg-blue-50 text-left text-xs transition-all shadow-sm group"
+            className="p-2 rounded-xl bg-white border border-slate-300 hover:border-blue-500 hover:bg-blue-50 text-left text-xs transition-all shadow-sm group"
           >
-            <p className="font-bold text-navy-900 group-hover:text-blue-700 flex items-center gap-1">
-              <UserCheck className="w-3.5 h-3.5 text-emerald-600" /> Observer Role
+            <p className="font-bold text-navy-900 group-hover:text-blue-700 flex items-center gap-1 text-[11px]">
+              <UserCheck className="w-3 h-3 text-emerald-600" /> Observer
             </p>
-            <p className="text-[10px] text-slate-500 mt-0.5 font-mono">observer@sevaqueue.org</p>
+            <p className="text-[9px] text-slate-400 mt-0.5 truncate">observer@sevasetu.org</p>
           </button>
         </div>
       </div>
@@ -120,8 +145,8 @@ const LoginPage = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="name@sevaqueue.org"
-                className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800"
+                placeholder="name@sevasetu.org"
+                className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800"
               />
             </div>
           </div>
@@ -138,7 +163,7 @@ const LoginPage = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800"
+                className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800"
               />
             </div>
           </div>
@@ -152,10 +177,19 @@ const LoginPage = () => {
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>
+
+        <div className="mt-5 pt-4 border-t border-slate-100 text-center">
+          <p className="text-xs text-slate-600">
+            Don't have an account yet?{' '}
+            <Link to="/register" className="text-blue-600 font-bold hover:underline">
+              Create a free Citizen Account
+            </Link>
+          </p>
+        </div>
       </div>
 
       <p className="text-center text-xs text-slate-500">
-        Citizens do not require registration to view queue updates or browse services.{' '}
+        Citizens do not require an account to browse services or view center details.{' '}
         <Link to="/" className="text-blue-700 font-bold hover:underline">
           Return to Public Homepage
         </Link>
@@ -165,4 +199,3 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
-

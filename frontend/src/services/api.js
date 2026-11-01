@@ -15,10 +15,12 @@ const api = axios.create({
   },
 });
 
+const getToken = () => localStorage.getItem('sevasetu_token') || localStorage.getItem('sevaqueue_token');
+
 // Request interceptor to attach JWT token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('sevaqueue_token');
+    const token = getToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -32,8 +34,13 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      const isAuthPath = window.location.pathname.startsWith('/admin') || window.location.pathname.startsWith('/observer');
+      const isAuthPath =
+        window.location.pathname.startsWith('/admin') ||
+        window.location.pathname.startsWith('/observer') ||
+        window.location.pathname.startsWith('/dashboard');
       if (isAuthPath) {
+        localStorage.removeItem('sevasetu_token');
+        localStorage.removeItem('sevasetu_user');
         localStorage.removeItem('sevaqueue_token');
         localStorage.removeItem('sevaqueue_user');
         window.location.href = '/login?expired=1';
@@ -45,6 +52,13 @@ api.interceptors.response.use(
 
 export const authService = {
   login: (email, password) => api.post('/auth/login', { email, password }),
+  register: (fullName, email, password, confirmPassword) =>
+    api.post('/auth/register', {
+      full_name: fullName,
+      email,
+      password,
+      confirm_password: confirmPassword,
+    }),
   logout: () => api.post('/auth/logout'),
   getCurrentUser: () => api.get('/auth/me'),
 };
@@ -55,6 +69,10 @@ export const publicService = {
   getCentreServices: (id, params) => api.get(`/centres/${id}/services`, { params }),
   getCentreQueue: (id) => api.get(`/centres/${id}/queue`),
   getAllServices: (params) => api.get('/services', { params }),
+  getService: (id) => api.get(`/services/${id}`),
+  getSavedServices: () => api.get('/saved-services'),
+  saveService: (service_id) => api.post('/saved-services', { service_id }),
+  removeSavedService: (service_id) => api.delete(`/saved-services/${service_id}`),
   submitAnonymousObservation: (data) => api.post('/public/observations', data),
   getDisclaimer: () => api.get('/public/disclaimer'),
 };
@@ -92,4 +110,3 @@ export const adminService = {
 };
 
 export default api;
-

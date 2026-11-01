@@ -3,9 +3,11 @@ from datetime import datetime
 from app.models import db
 from app.models.centre import Centre
 from app.models.service import Service
+from app.models.saved_service import SavedService
 from app.models.observation import Observation
 from app.models.queue_update import QueueUpdate
 from app.models.setting import Setting
+from app.middleware.auth import jwt_required, get_current_user
 from app.services.queue_service import compute_centre_queue_status
 from app.utils.validators import validate_queue_status, check_personal_info, sanitize_text
 
@@ -15,25 +17,128 @@ public_bp = Blueprint('public', __name__, url_prefix='/api')
 def health():
     return jsonify({
         'status': 'healthy',
-        'application': 'SevaQueue',
-        'tagline': 'Know Before You Visit',
+        'application': 'Seva Setu',
+        'tagline': 'Government Services, Made Simpler.',
         'timestamp': datetime.utcnow().isoformat(),
-        'mode': 'independent-pilot-demonstration'
+        'mode': 'independent-citizen-assistance-platform'
     }), 200
 
+# ---------------- SERVICES ----------------
+@public_bp.route('/services', methods=['GET'])
+def get_all_services():
+    query = Service.query.filter_by(is_active=True)
+    category = request.args.get('category')
+    search = request.args.get('search')
+    centre_id = request.args.get('centre_id')
+
+    if centre_id:
+        query = query.filter_by(centre_id=centre_id)
+    if category and category != 'All':
+        query = query.filter_by(category=category)
+    if search:
+        s_term = f"%{search.strip()}%"
+        query = query.filter(
+            (Service.name.ilike(s_term)) |
+            (Service.description.ilike(s_term)) |
+            (Service.category.ilike(s_term)) |
+            (Service.required_documents.ilike(s_term)) |
+            (Service.department.ilike(s_term))
+        )
+
+    services = [s.to_dict() for s in query.all()]
+    
+    # All distinct categories
+    categories = [r[0] for r in db.session.query(Service.category).distinct().all() if r[0]]
+
+    return jsonify({
+        'success': True,
+        'count': len(services),
+        'categories': ['All'] + sorted(categories),
+        'services': services
+    }), 200
+
+@public_bp.route('/services/<int:service_id>', methods=['GET'])
+def get_service_details(service_id):
+    service = Service.query.get_or_404(service_id)
+    s_dict = service.to_dict()
+
+    # Check if saved by current logged-in user
+    user = get_current_user()
+    s_dict['is_saved'] = False
+    if user:
+        s_dict['is_saved'] = SavedService.query.filter_by(user_id=user.id, service_id=service.id).first() is not None
+
+    return jsonify({'success': True, 'service': s_dict}), 200
+
+# ---------------- SAVED SERVICES (FAVOURITES) ----------------
+@public_bp.route('/saved-services', methods=['GET'])
+@jwt_required
+def get_saved_services():
+    user = request.current_user
+    saved = SavedService.query.filter_by(user_id=user.id).order_by(SavedService.created_at.desc()).all()
+    return jsonify({
+        'success': True,
+        'count': len(saved),
+        'saved_services': [item.to_dict() for item in saved]
+    }), 200
+
+@public_bp.route('/saved-services', methods=['POST'])
+@jwt_required
+def save_service():
+    user = request.current_user
+    data = request.get_json() or {}
+    service_id = data.get('service_id')
+
+    if not service_id:
+        return jsonify({'success': False, 'message': 'service_id is required'}), 400
+
+    service = Service.query.get(service_id)
+    if not service:
+        return jsonify({'success': False, 'message': 'Service not found'}), 404
+
+    existing = SavedService.query.filter_by(user_id=user.id, service_id=service.id).first()
+    if existing:
+        return jsonify({'success': True, 'message': 'Service already bookmarked', 'saved': existing.to_dict()}), 200
+
+    new_saved = SavedService(user_id=user.id, service_id=service.id)
+    db.session.add(new_saved)
+    db.session.commit()
+
+    return jsonify({
+        'success': True,
+        'message': 'Service added to your favourites.',
+        'saved': new_saved.to_dict()
+    }), 201
+
+@public_bp.route('/saved-services/<int:service_id>', methods=['DELETE'])
+@jwt_required
+def remove_saved_service(service_id):
+    user = request.current_user
+    saved = SavedService.query.filter_by(user_id=user.id, service_id=service_id).first()
+    if saved:
+        db.session.delete(saved)
+        db.session.commit()
+    return jsonify({'success': True, 'message': 'Service removed from favourites.'}), 200
+
+# ---------------- CENTRES ----------------
 @public_bp.route('/centres', methods=['GET'])
 def get_centres():
     query = Centre.query.filter_by(is_active=True)
     district = request.args.get('district')
+    block = request.args.get('block')
     search = request.args.get('search')
 
-    if district:
+    if district and district != 'All':
         query = query.filter(Centre.district.ilike(f"%{district.strip()}%"))
+    if block and block != 'All':
+        query = query.filter(Centre.block.ilike(f"%{block.strip()}%"))
     if search:
+        s_term = f"%{search.strip()}%"
         query = query.filter(
-            (Centre.name.ilike(f"%{search.strip()}%")) |
-            (Centre.district.ilike(f"%{search.strip()}%")) |
-            (Centre.block.ilike(f"%{search.strip()}%"))
+            (Centre.name.ilike(s_term)) |
+            (Centre.district.ilike(s_term)) |
+            (Centre.block.ilike(s_term)) |
+            (Centre.address.ilike(s_term))
         )
 
     centres = query.all()
@@ -44,7 +149,16 @@ def get_centres():
         c_dict['service_count'] = c.services.filter_by(is_active=True).count()
         results.append(c_dict)
 
-    return jsonify({'success': True, 'centres': results}), 200
+    # Distinct districts & blocks for filters
+    districts = [r[0] for r in db.session.query(Centre.district).distinct().all() if r[0]]
+    blocks = [r[0] for r in db.session.query(Centre.block).distinct().all() if r[0]]
+
+    return jsonify({
+        'success': True,
+        'centres': results,
+        'districts': ['All'] + sorted(districts),
+        'blocks': ['All'] + sorted(blocks)
+    }), 200
 
 @public_bp.route('/centres/<int:centre_id>', methods=['GET'])
 def get_centre(centre_id):
@@ -57,19 +171,7 @@ def get_centre(centre_id):
 @public_bp.route('/centres/<int:centre_id>/services', methods=['GET'])
 def get_centre_services(centre_id):
     centre = Centre.query.get_or_404(centre_id)
-    category = request.args.get('category')
-    search = request.args.get('search')
-
-    query = Service.query.filter_by(centre_id=centre.id, is_active=True)
-    if category and category != 'All':
-        query = query.filter_by(category=category)
-    if search:
-        query = query.filter(
-            (Service.name.ilike(f"%{search.strip()}%")) |
-            (Service.description.ilike(f"%{search.strip()}%"))
-        )
-
-    services = [s.to_dict() for s in query.all()]
+    services = [s.to_dict() for s in Service.query.filter_by(is_active=True).all()]
     return jsonify({
         'success': True,
         'centre': {'id': centre.id, 'name': centre.name},
@@ -93,89 +195,12 @@ def get_centre_queue(centre_id):
         'queue': status_data
     }), 200
 
-@public_bp.route('/services', methods=['GET'])
-def get_all_services():
-    query = Service.query.filter_by(is_active=True)
-    category = request.args.get('category')
-    search = request.args.get('search')
-    centre_id = request.args.get('centre_id')
-
-    if centre_id:
-        query = query.filter_by(centre_id=centre_id)
-    if category and category != 'All':
-        query = query.filter_by(category=category)
-    if search:
-        query = query.filter(
-            (Service.name.ilike(f"%{search.strip()}%")) |
-            (Service.description.ilike(f"%{search.strip()}%"))
-        )
-
-    services = [s.to_dict() for s in query.all()]
-    
-    # Also fetch all distinct categories for filtering
-    categories = [r[0] for r in db.session.query(Service.category).distinct().all() if r[0]]
-
-    return jsonify({
-        'success': True,
-        'count': len(services),
-        'categories': ['All'] + sorted(categories),
-        'services': services
-    }), 200
-
-@public_bp.route('/public/observations', methods=['POST'])
-def submit_anonymous_observation():
-    allow_anon = Setting.get('allow_anonymous_observations', 'true').lower() == 'true'
-    if not allow_anon:
-        return jsonify({
-            'success': False,
-            'message': 'Anonymous public observations are currently disabled by the pilot policy.'
-        }), 403
-
-    data = request.get_json() or {}
-    centre_id = data.get('centre_id')
-    queue_status = (data.get('queue_status') or '').upper()
-    notes = sanitize_text(data.get('notes', ''))
-    waiting_range = sanitize_text(data.get('waiting_range', ''))
-
-    if not centre_id:
-        return jsonify({'success': False, 'message': 'Centre is required.'}), 400
-
-    centre = Centre.query.get(centre_id)
-    if not centre or not centre.is_active:
-        return jsonify({'success': False, 'message': 'Invalid or inactive centre.'}), 400
-
-    if not validate_queue_status(queue_status):
-        return jsonify({'success': False, 'message': 'Valid queue status (LOW, MODERATE, HIGH, UNKNOWN) is required.'}), 400
-
-    has_pii, warning = check_personal_info(notes)
-    if has_pii:
-        return jsonify({'success': False, 'message': warning}), 400
-
-    observation = Observation(
-        observer_id=None,
-        centre_id=centre.id,
-        queue_status=queue_status,
-        waiting_range=waiting_range if waiting_range else None,
-        notes=notes if notes else None,
-        submission_source='PUBLIC_ANONYMOUS',
-        review_status='PENDING',
-        submitted_at=datetime.utcnow()
-    )
-    db.session.add(observation)
-    db.session.commit()
-
-    return jsonify({
-        'success': True,
-        'message': 'Thank you! Your observation has been submitted and queued for administrator review before affecting the published status.',
-        'observation_id': observation.id
-    }), 201
-
+# ---------------- DISCLAIMER ----------------
 @public_bp.route('/public/disclaimer', methods=['GET'])
 def get_disclaimer():
     return jsonify({
         'success': True,
-        'title': 'Independent Demonstration Project Disclaimer',
-        'content': 'SevaQueue is an independent technological demonstration project and is NOT officially affiliated with, endorsed by, or operated by the Government of West Bengal or any Bangla Sahayata Kendra (BSK). All queue information reflects reviewed community observations or sample demo metrics and does not guarantee waiting times.',
-        'tagline': 'Know Before You Visit.'
+        'title': 'Independent Platform Notice',
+        'content': 'Seva Setu is an independent citizen assistance platform designed to simplify access to government service information in West Bengal. It is NOT officially affiliated with, endorsed by, or operated by the Government of West Bengal or any Bangla Sahayata Kendra (BSK). All application links redirect safely to official state portals.',
+        'tagline': 'Government Services, Made Simpler.'
     }), 200
-

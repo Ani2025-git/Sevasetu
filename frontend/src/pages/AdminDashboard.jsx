@@ -331,7 +331,7 @@ const AdminDashboard = () => {
             <span className="text-xs text-slate-300">Bangla Sahayata Kendra Pilot</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-            SevaQueue Operations & Governance
+            Seva Setu Operations & Governance
           </h1>
           <p className="text-xs text-slate-300">
             Signed in as <strong>{user?.name}</strong> ({user?.email}) • Administrator Privileges Active
@@ -1317,12 +1317,79 @@ const AdminDashboard = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Official Portal URL</label>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Official Source / Guideline URL</label>
                 <input
                   type="url"
                   value={serviceModal.data.official_source_url || ''}
                   onChange={(e) => setServiceModal({ ...serviceModal, data: { ...serviceModal.data, official_source_url: e.target.value } })}
                   placeholder="https://..."
+                  className="w-full text-sm rounded-xl border border-slate-300 px-3 py-2"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Department</label>
+                <input
+                  type="text"
+                  value={serviceModal.data.department || ''}
+                  onChange={(e) => setServiceModal({ ...serviceModal, data: { ...serviceModal.data, department: e.target.value } })}
+                  placeholder="e.g. Department of Personnel & Administrative Reforms"
+                  className="w-full text-sm rounded-xl border border-slate-300 px-3 py-2"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Fee</label>
+                  <input
+                    type="text"
+                    value={serviceModal.data.fees || ''}
+                    onChange={(e) => setServiceModal({ ...serviceModal, data: { ...serviceModal.data, fees: e.target.value } })}
+                    placeholder="e.g. Free"
+                    className="w-full text-sm rounded-xl border border-slate-300 px-3 py-2"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Processing Time</label>
+                  <input
+                    type="text"
+                    value={serviceModal.data.expected_processing_time || ''}
+                    onChange={(e) => setServiceModal({ ...serviceModal, data: { ...serviceModal.data, expected_processing_time: e.target.value } })}
+                    placeholder="e.g. 7 - 15 Days"
+                    className="w-full text-sm rounded-xl border border-slate-300 px-3 py-2"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Direct Online Apply URL</label>
+                <input
+                  type="url"
+                  value={serviceModal.data.online_apply_url || ''}
+                  onChange={(e) => setServiceModal({ ...serviceModal, data: { ...serviceModal.data, online_apply_url: e.target.value } })}
+                  placeholder="https://edistrict.wb.gov.in/..."
+                  className="w-full text-sm rounded-xl border border-slate-300 px-3 py-2"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Eligibility Criteria</label>
+                <textarea
+                  rows={2}
+                  value={serviceModal.data.eligibility || ''}
+                  onChange={(e) => setServiceModal({ ...serviceModal, data: { ...serviceModal.data, eligibility: e.target.value } })}
+                  placeholder="Resident of West Bengal, valid family income..."
+                  className="w-full text-sm rounded-xl border border-slate-300 px-3 py-2"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Offline Instructions (BSK / Office)</label>
+                <textarea
+                  rows={2}
+                  value={serviceModal.data.offline_instructions || ''}
+                  onChange={(e) => setServiceModal({ ...serviceModal, data: { ...serviceModal.data, offline_instructions: e.target.value } })}
+                  placeholder="Instructions for visiting BSK counters..."
                   className="w-full text-sm rounded-xl border border-slate-300 px-3 py-2"
                 />
               </div>
@@ -1380,7 +1447,7 @@ const AdminDashboard = () => {
                   required
                   value={userModal.data.email}
                   onChange={(e) => setUserModal({ ...userModal, data: { ...userModal.data, email: e.target.value } })}
-                  placeholder="name@sevaqueue.org"
+                  placeholder="name@sevasetu.org"
                   className="w-full text-sm rounded-xl border border-slate-300 px-3 py-2"
                 />
               </div>

@@ -1,209 +1,142 @@
-# Sevasetu (SevaQueue) — Smart Government Service Visit & Queue Information Platform
+# Seva Setu — Connecting Citizens with Government Services
 
-> **"Know Before You Visit."**  
-> An independent civic innovation demonstration project for **Bangla Sahayata Kendras (BSK)** in West Bengal, India.
-
----
-
-## ⚠️ Important Independent Pilot Disclaimer
-**SevaQueue is an independent demonstration prototype.**  
-It is **NOT** officially affiliated with, endorsed by, certified by, or operated by the Government of West Bengal or any Bangla Sahayata Kendra. All centre metrics, sample documents, and queue updates represent simulated pilot demonstration observations.
-
-For official government services and applications, visit the official portal:  
-👉 **[https://bsk.wb.gov.in](https://bsk.wb.gov.in)**
+> **"Government Services, Made Simpler."**  
+> An independent digital citizen assistance platform and government service guide for **West Bengal, India**.
 
 ---
 
-## 🌟 Key Features
+## ⚠️ Independent Citizen Assistance Platform Notice
+**Seva Setu is an independent educational and citizen assistance platform.**  
+It is **NOT** officially affiliated with, operated by, endorsed by, or partnered with the Government of West Bengal or any Bangla Sahayata Kendra (BSK). All application forms, certificates, and document verifications must be submitted directly through official government portals or at authorized BSK physical counters.
 
-### 1. Public Citizen Portal (No Registration Required)
-- **Explore BSK Centres:** View centre addresses, official opening hours, and notified weekly holidays.
-- **Service Document Checklists:** Verified document requirements (proof of ID, residence, photographs) for Income, Caste, Ration Card, Swasthya Sathi, and Scholarships.
-- **Real-Time Queue Indicator:** Evidence-backed status badges (**Low**, **Moderate**, **High**, or **No Recent Update**).
-- **Staleness Tracking:** Observations older than **30 minutes** are flagged as stale so citizens are never misled.
-- **Privacy First (No PII):** No citizen accounts required; automated regex filters prevent submission of phone numbers or Aadhaar numbers.
-
-### 2. Field Observer Portal (Secure JWT Auth)
-- Log empirical queue observations (Low / Moderate / High / Unknown).
-- Add approximate waiting ranges and non-personal field notes.
-- Review own submission history and status (**Pending**, **Approved**, **Rejected**).
-- Observers cannot publish directly to the public dashboard.
-
-### 3. Administrator Operations Dashboard
-- **Overview & Analytics:** Real-time statistics, Recharts observation distribution chart, recent broadcasts.
-- **Centre Management:** Add, edit, or delete BSK service centres with confirmation dialogs.
-- **Service Management:** Maintain service catalogs, document checklists, and official portal links.
-- **Queue Publishing:** Broadcast queue updates with mandatory evidence source attribution and supporting observation counts.
-- **Observation Review:** Approve or reject pending citizen and field observer submissions.
-- **Audit Logs:** Immutable audit log tracking all administrative changes.
-- **User Management:** Create observer accounts and toggle account status.
-- **Configurable Settings:** Custom staleness time limits (e.g., 30 mins) and anonymous submission controls.
+Official state portals:
+- **Bangla Sahayata Kendra (BSK):** [https://bsk.wb.gov.in](https://bsk.wb.gov.in)
+- **West Bengal e-District Portal:** [https://edistrict.wb.gov.in](https://edistrict.wb.gov.in)
+- **Oasis Caste Certificate Portal:** [https://castcertificatewb.gov.in](https://castcertificatewb.gov.in)
+- **Janma-Mrityu Tathya (Birth & Death):** [https://janmamrityutathya.wb.gov.in](https://janmamrityutathya.wb.gov.in)
+- **Food & Supplies Department:** [https://food.wb.gov.in](https://food.wb.gov.in)
 
 ---
 
-## 🔑 Demo Login Credentials
+## 🌟 Key Platform Capabilities
 
-| Role | Email | Password | Access Rights |
+### 1. Government Certificate Directory
+- Comprehensive service profiles for primary West Bengal public certificates:
+  * **Income Certificate** (Personnel & Administrative Reforms / e-District)
+  * **Caste Certificate (SC / ST / OBC)** (Backward Classes Welfare Department)
+  * **Residential / Domicile Certificate** (Home & Hill Affairs)
+  * **Birth Certificate** (Department of Health & Family Welfare / Janma-Mrityu Tathya)
+  * **Death Certificate** (Health & Family Welfare)
+  * **Digital Ration Card (NFSA / RKSY)** (Department of Food & Supplies)
+- Filter by department and certificate category with instant search.
+- Verified details: Processing timelines, government fees (e.g. Free), and eligibility rules.
+
+### 2. Interactive Document Checklist System
+- Clear list of mandatory proofs required before applying.
+- Interactive checkable checkboxes with dynamic progress tracking (0% to 100%).
+- State saved to browser `localStorage` per service so preparation progress is never lost.
+- One-click copy checklist and print options for offline preparation.
+
+### 3. Safe Direct Application System
+- Direct links to authentic Government of West Bengal web portals.
+- **External Redirect Notice Modal:** Proactively warns citizens whenever they leave Seva Setu for an official portal, confirming domain authenticity and reminding citizens not to share passwords or pay intermediaries.
+
+### 4. Offline Application & BSK Locator
+- Comprehensive instructions for in-person applications at Bangla Sahayata Kendras (BSK) and Block Development Offices (BDO).
+- Centre details, physical address, published operating hours (10:00 AM – 5:00 PM), and notified holiday schedules.
+
+### 5. Transparent BSK Queue Feature — Coming Soon
+- Explicitly marked as **"Coming Soon"** to maintain absolute public trust.
+- Strict policy against fabricated, estimated, or simulated wait counters.
+- Blueprint for on-ground observer verification before live publishing.
+- District-wise notification subscription for citizens.
+
+### 6. Citizen Account & Saved Services
+- Simple, privacy-preserving registration (Full Name, Email, Password).
+- No sensitive PII collected (no Aadhaar, PAN, phone OTP, or bank passbooks).
+- Personal dashboard to bookmark services and review document preparation.
+
+### 7. Governance & Administrative Dashboard
+- Complete CRUD controls for service profiles and BSK centres.
+- Review queue submissions from certified field observers.
+- Immutable audit log and system settings.
+
+---
+
+## 🔑 Demo Access Credentials
+
+| Role | Email | Password | Access Scope |
 |---|---|---|---|
-| **Administrator** | `admin@sevaqueue.org` | `Admin@123` | Full dashboard operations, queue publishing, observation review, user & centre management |
-| **Field Observer** | `observer@sevaqueue.org` | `Observer@123` | Submit observations, view personal log history |
-| **Volunteer Observer**| `volunteer@sevaqueue.org`| `Volunteer@123` | Submit observations, view personal log history |
-| **Public Citizen** | *(No login needed)* | *(None)* | Browse centres, read checklists, view queue status, submit anonymous observation |
-
-*Tip: The `/login` page includes **One-Click Demo Fill buttons** for instant evaluation.*
+| **Citizen** | `citizen@sevasetu.org` | `Citizen@123` | Save services, track checklists, access personal citizen dashboard |
+| **Field Observer** | `observer@sevasetu.org` | `Observer@123` | Submit field queue observations for review |
+| **Administrator** | `admin@sevasetu.org` | `Admin@123` | Service management, centre controls, queue broadcasts, audit logs |
 
 ---
 
-## 🚀 Quick Start Instructions (Windows)
+## 🛠️ Technology Stack
 
-### Prerequisites
-- Python 3.10+ installed
-- Node.js 18+ and npm installed
+- **Frontend:** React 18, Vite, Tailwind CSS, React Router v6, Lucide React, Recharts
+- **Backend:** Python 3.10+, Flask, Flask-SQLAlchemy, Flask-CORS, Flask-Migrate, Gunicorn
+- **Database:** PostgreSQL (Production / Neon) with SQLite automatic local fallback
+- **Security:** Bcrypt password hashing, JWT stateless token authentication, regex PII sanitizers
 
 ---
 
-### Step 1: Initialize Database & Seed Sample Data
-Open PowerShell or Command Prompt in the project root:
+## 🚀 Deployment Guide
 
-```powershell
-cd "d:\Seva Queue\backend"
+### A. Frontend Deployment (Vercel)
+1. Push repository to GitHub: `https://github.com/Ani2025-git/Sevasetu.git`
+2. Import project into [Vercel](https://vercel.com).
+3. Set the following Build Settings:
+   - **Framework Preset:** Vite
+   - **Root Directory:** `frontend` (or `./`)
+   - **Build Command:** `node node_modules/vite/bin/vite.js build && node sync-dist.js`
+   - **Output Directory:** `dist`
+4. Set Environment Variables:
+   - `VITE_API_BASE_URL`: `https://your-backend-on-render.onrender.com`
 
-# If using the pre-configured virtual environment:
-.\venv\Scripts\python.exe seed.py
+### B. Backend Deployment (Render)
+1. Create a **Web Service** on [Render](https://render.com) connected to the repository.
+2. Settings:
+   - **Root Directory:** `backend`
+   - **Environment:** `Python 3`
+   - **Build Command:** `pip install -r requirements.txt`
+   - **Start Command:** `gunicorn --bind 0.0.0.0:$PORT run:app`
+3. Environment Variables:
+   - `FLASK_ENV`: `production`
+   - `DATABASE_URL`: `postgresql://<user>:<password>@<neon-host>/<database>?sslmode=require`
+   - `JWT_SECRET_KEY`: `<secure-random-key>`
+   - `AUTO_SEED`: `true` (auto-populates verified West Bengal services and demo accounts on first boot)
 
-# Or if using system python:
+---
+
+## 💻 Local Development Setup
+
+### 1. Clone Repository
+```bash
+git clone https://github.com/Ani2025-git/Sevasetu.git
+cd Sevasetu
+```
+
+### 2. Backend Setup
+```bash
+cd backend
+python -m venv venv
+# Windows:
+.\venv\Scripts\activate
+# Linux/macOS:
+source venv/bin/activate
+
+pip install -r requirements.txt
 python seed.py
+python run.py
 ```
-*(Or simply double-click `seed-database.bat`)*
+Backend API will be running at `http://127.0.0.1:5000`.
 
----
-
-### Step 2: Start the Backend API Server
-```powershell
-cd "d:\Seva Queue\backend"
-
-# Run Flask server on port 5000:
-.\venv\Scripts\python.exe run.py
+### 3. Frontend Setup
+```bash
+cd ../frontend
+npm install
+npm run dev
 ```
-*(Or double-click `start-backend.bat`)*  
-The API server will run at: `http://127.0.0.1:5000`
-
----
-
-### Step 3: Start the React Frontend Server
-In a second terminal window:
-
-```powershell
-cd "d:\Seva Queue\frontend"
-
-# Launch Vite development server on port 5173:
-node node_modules/vite/bin/vite.js
-```
-*(Or double-click `start-frontend.bat`)*  
-The web application will open at: `http://localhost:5173`
-
----
-
-## 📡 REST API Reference
-
-### Authentication
-- `POST /api/auth/login` — Authenticate staff/observer and receive JWT bearer token.
-- `POST /api/auth/logout` — Logout user session.
-- `GET /api/auth/me` — Retrieve active user profile.
-
-### Public Endpoints
-- `GET /api/health` — API health check and pilot status.
-- `GET /api/centres` — List active BSK service centres with current queue summaries.
-- `GET /api/centres/:id` — Centre details, operating hours, and location data.
-- `GET /api/centres/:id/services` — Filter services available at a specific centre.
-- `GET /api/centres/:id/queue` — Current queue status, source description, and staleness flag.
-- `GET /api/services` — Master catalog of services with required document checklists.
-- `POST /api/public/observations` — Optional anonymous observation submission (reviewed before publish).
-- `GET /api/public/disclaimer` — Pilot charter and legal disclaimer.
-
-### Observer Endpoints
-- `POST /api/observations` — Submit queue observation with notes (requires Observer/Admin token).
-- `GET /api/observations/my` — List authenticated observer's submission history.
-
-### Administrator Endpoints
-- `GET /api/admin/dashboard` — Platform statistics, 7-day trend, and queue metrics.
-- `POST /api/admin/centres` | `PUT /api/admin/centres/:id` | `DELETE /api/admin/centres/:id` — Centre CRUD.
-- `POST /api/admin/services` | `PUT /api/admin/services/:id` | `DELETE /api/admin/services/:id` — Service CRUD.
-- `GET /api/admin/observations` — View all submitted observations.
-- `POST /api/admin/observations/:id/review` — Approve or reject an observation.
-- `POST /api/admin/queue-updates` — Publish official queue status with evidence attribution.
-- `GET /api/admin/history` — Historical queue broadcasts.
-- `GET /api/admin/audit-logs` — Immutable audit logs.
-- `GET /api/admin/users` | `POST /api/admin/users` | `PUT /api/admin/users/:id` — User accounts.
-- `GET /api/admin/settings` | `PUT /api/admin/settings` — Stale threshold and policy settings.
-
----
-
-## 🛡️ Security & Privacy Features
-- **Password Hashing:** Passwords encrypted using Werkzeug secure password hashes.
-- **JWT Authorization:** Bearer token authentication with role-based access validation.
-- **SQL Injection Prevention:** Built entirely on SQLAlchemy ORM parameterized queries.
-- **Cross-Site Scripting (XSS) Sanitization:** Input sanitizers clean all user-provided strings.
-- **Anti-PII Detection:** Rejection of observations containing phone numbers or Aadhaar patterns.
-- **Audit Logging:** System automatically logs all key modifications.
-
----
-
-## 📂 Project Structure
-```
-d:\Seva Queue\
-├── backend/
-│   ├── app/
-│   │   ├── middleware/        # JWT & Role authorization
-│   │   ├── models/            # SQLAlchemy database models
-│   │   ├── routes/            # REST API endpoints (auth, public, observer, admin)
-│   │   ├── services/          # Queue staleness logic & audit services
-│   │   └── utils/             # Input & anti-PII validators
-│   ├── config.py              # Application settings
-│   ├── run.py                 # Backend runner
-│   ├── seed.py                # Database seeder with sample data
-│   └── requirements.txt       # Python dependencies
-│
-├── frontend/
-│   ├── src/
-│   │   ├── components/        # Navbar, Footer, QueueBadge, Modals
-│   │   ├── context/           # AuthContext (JWT management)
-│   │   ├── pages/             # Home, CentreDetails, Services, Queue, Dashboards
-│   │   ├── services/          # Axios API client
-│   │   ├── App.jsx            # React Router & protected routes
-│   │   ├── main.jsx           # Entrypoint
-│   │   └── index.css          # Tailwind CSS
-│   ├── vite.config.js         # Vite configuration with API proxy
-│   └── package.json           # Frontend dependencies
-│
-├── docs/
-│   ├── disclaimer.md          # Independent project legal charter
-│   ├── privacy-policy.md      # Zero-PII privacy guarantee
-│   └── pilot-plan.md          # Architecture and queue model plan
-│
-├── seed-database.bat          # 1-click DB seeder
-├── start-backend.bat          # 1-click Backend launcher
-├── start-frontend.bat         # 1-click Frontend launcher
-├── .env.example               # Environment variables template
-├── .gitignore                 # Version control exclusions
-└── README.md                  # Complete documentation
-```
-
----
-
-## 🧪 Testing Verification
-All endpoints, authentication flows, queue calculations, and UI components have been tested.
-To verify API health directly:
-```powershell
-curl http://127.0.0.1:5000/api/health
-```
-Expected response:
-```json
-{
-  "application": "SevaQueue",
-  "mode": "independent-pilot-demonstration",
-  "status": "healthy",
-  "tagline": "Know Before You Visit"
-}
-```
-
+Frontend development server will open at `http://localhost:5173`.

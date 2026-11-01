@@ -144,32 +144,44 @@ def create_service():
 
     centre_id = data.get('centre_id')
     name = sanitize_text(data.get('name'))
-    category = sanitize_text(data.get('category', 'General Services'))
+    category = sanitize_text(data.get('category', 'Certificates & Revenue'))
     description = sanitize_text(data.get('description'))
+    department = sanitize_text(data.get('department', 'Government of West Bengal'))
+    eligibility = sanitize_text(data.get('eligibility', ''))
     required_documents = sanitize_text(data.get('required_documents', ''))
+    application_process = sanitize_text(data.get('application_process', ''))
+    offline_instructions = sanitize_text(data.get('offline_instructions', ''))
+    online_apply_url = sanitize_text(data.get('online_apply_url', ''))
     official_source_url = sanitize_text(data.get('official_source_url', ''))
+    fees = sanitize_text(data.get('fees', 'Free of Cost'))
+    expected_processing_time = sanitize_text(data.get('expected_processing_time', '7 - 15 Working Days'))
+    verification_status = sanitize_text(data.get('verification_status', 'OFFICIALLY_VERIFIED'))
 
-    if not centre_id or not name or not description:
-        return jsonify({'success': False, 'message': 'Centre, name, and description are required.'}), 400
-
-    centre = Centre.query.get(centre_id)
-    if not centre:
-        return jsonify({'success': False, 'message': 'Invalid centre specified.'}), 400
+    if not name or not description:
+        return jsonify({'success': False, 'message': 'Name and description are required.'}), 400
 
     service = Service(
-        centre_id=centre.id,
+        centre_id=centre_id if centre_id else None,
         name=name,
         category=category,
         description=description,
+        department=department,
+        eligibility=eligibility,
         required_documents=required_documents if required_documents else None,
+        application_process=application_process,
+        offline_instructions=offline_instructions,
+        online_apply_url=online_apply_url if online_apply_url else None,
         official_source_url=official_source_url if official_source_url else None,
+        fees=fees,
+        expected_processing_time=expected_processing_time,
+        verification_status=verification_status,
         last_verified_at=datetime.utcnow(),
         is_active=True
     )
     db.session.add(service)
     db.session.commit()
 
-    log_audit(user.id, 'CREATE_SERVICE', 'Service', service.id, f"Admin added service '{service.name}' for {centre.name}.")
+    log_audit(user.id, 'CREATE_SERVICE', 'Service', service.id, f"Admin added service '{service.name}'.")
 
     return jsonify({
         'success': True,
@@ -187,8 +199,16 @@ def update_service(service_id):
     if 'name' in data: service.name = sanitize_text(data['name'])
     if 'category' in data: service.category = sanitize_text(data['category'])
     if 'description' in data: service.description = sanitize_text(data['description'])
+    if 'department' in data: service.department = sanitize_text(data['department'])
+    if 'eligibility' in data: service.eligibility = sanitize_text(data['eligibility'])
     if 'required_documents' in data: service.required_documents = sanitize_text(data['required_documents'])
+    if 'application_process' in data: service.application_process = sanitize_text(data['application_process'])
+    if 'offline_instructions' in data: service.offline_instructions = sanitize_text(data['offline_instructions'])
+    if 'online_apply_url' in data: service.online_apply_url = sanitize_text(data['online_apply_url'])
     if 'official_source_url' in data: service.official_source_url = sanitize_text(data['official_source_url'])
+    if 'fees' in data: service.fees = sanitize_text(data['fees'])
+    if 'expected_processing_time' in data: service.expected_processing_time = sanitize_text(data['expected_processing_time'])
+    if 'verification_status' in data: service.verification_status = sanitize_text(data['verification_status'])
     if 'is_active' in data: service.is_active = bool(data['is_active'])
     
     service.last_verified_at = datetime.utcnow()

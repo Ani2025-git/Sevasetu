@@ -20,3 +20,4 @@ services:
         value: "false"
       - key: STALE_THRESHOLD_MINUTES
         value: "30"
+
