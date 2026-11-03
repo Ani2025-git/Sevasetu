@@ -946,4 +946,46 @@ def get_scheme_history(id):
         'history': [h.to_dict() for h in history]
     }), 200
 
+@admin_bp.route('/schemes/<int:id>', methods=['DELETE'])
+@admin_required
+def delete_scheme(id):
+    admin = request.current_user
+    scheme = GovernmentScheme.query.get(id)
+    if not scheme:
+        return jsonify({'success': False, 'message': 'Scheme not found'}), 404
+
+    scheme_name = scheme.name
+    if scheme.status == 'DRAFT':
+        SchemeEligibilityRule.query.filter_by(scheme_id=scheme.id).delete()
+        SchemeRequiredDocument.query.filter_by(scheme_id=scheme.id).delete()
+        SchemeOfficialSource.query.filter_by(scheme_id=scheme.id).delete()
+        SchemeVerificationHistory.query.filter_by(scheme_id=scheme.id).delete()
+        db.session.delete(scheme)
+        db.session.commit()
+        log_audit(admin.id, 'DELETE_SCHEME', 'GovernmentScheme', id, f"Deleted draft scheme {scheme_name}")
+        return jsonify({
+            'success': True,
+            'message': f"Draft scheme '{scheme_name}' has been deleted."
+        }), 200
+    else:
+        old_status = scheme.status
+        scheme.status = 'ARCHIVED'
+        scheme.verification_status = 'ARCHIVED'
+        scheme.updated_by = admin.id
+        scheme.updated_at = datetime.utcnow()
+        history = SchemeVerificationHistory(
+            scheme_id=scheme.id,
+            admin_id=admin.id,
+            previous_status=old_status,
+            new_status='ARCHIVED',
+            notes="Archived via delete request for audit compliance."
+        )
+        db.session.add(history)
+        db.session.commit()
+        log_audit(admin.id, 'ARCHIVE_SCHEME', 'GovernmentScheme', scheme.id, f"Archived scheme {scheme_name}")
+        return jsonify({
+            'success': True,
+            'message': f"Scheme '{scheme_name}' has been archived for compliance."
+        }), 200
+
 

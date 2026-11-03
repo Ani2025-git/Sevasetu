@@ -125,6 +125,7 @@ export const adminService = {
   getScheme: (id) => api.get(`/admin/schemes/${id}`),
   createScheme: (data) => api.post('/admin/schemes', data),
   updateScheme: (id, data) => api.put(`/admin/schemes/${id}`, data),
+  deleteScheme: (id) => api.delete(`/admin/schemes/${id}`),
   updateSchemeStatus: (id, data) => api.patch(`/admin/schemes/${id}/status`, data),
   submitSchemeVerification: (id, data) => api.post(`/admin/schemes/${id}/submit-verification`, data),
   publishScheme: (id, data) => api.post(`/admin/schemes/${id}/publish`, data),

@@ -239,6 +239,28 @@ const AdminSchemeManager = ({ onSchemeUpdate }) => {
     }
   };
 
+  const confirmDeleteScheme = (scheme) => {
+    setConfirmAction({
+      isOpen: true,
+      title: `Delete Scheme "${scheme.name}"?`,
+      message: scheme.status === 'DRAFT'
+        ? 'This will permanently delete this draft scheme and all its rules.'
+        : 'This scheme is published or verified. It will be archived and removed from citizen view.',
+      confirmText: scheme.status === 'DRAFT' ? 'Delete Draft' : 'Archive Scheme',
+      onConfirm: async () => {
+        try {
+          const res = await adminService.deleteScheme(scheme.id);
+          if (res.data.success) {
+            showAlert(res.data.message || `Scheme "${scheme.name}" removed.`);
+            loadSchemesData();
+          }
+        } catch (err) {
+          showAlert(err.response?.data?.message || 'Failed to delete scheme.', 'error');
+        }
+      }
+    });
+  };
+
   return (
     <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
       {/* Toast Alert */}
@@ -434,6 +456,15 @@ const AdminSchemeManager = ({ onSchemeUpdate }) => {
                         title="Verification History"
                       >
                         <History className="w-3.5 h-3.5" />
+                      </button>
+
+                      {/* Delete / Archive Button */}
+                      <button
+                        onClick={() => confirmDeleteScheme(s)}
+                        className="p-1.5 rounded-lg border border-slate-200 text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors inline-block"
+                        title={s.status === 'DRAFT' ? 'Delete Draft Scheme' : 'Archive Scheme'}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
 
                       {/* Workflow state buttons */}
@@ -888,6 +919,16 @@ const AdminSchemeManager = ({ onSchemeUpdate }) => {
           </div>
         </div>
       )}
+
+      {/* Confirmation Modal */}
+      <ConfirmModal
+        isOpen={confirmAction.isOpen}
+        title={confirmAction.title}
+        message={confirmAction.message}
+        confirmText={confirmAction.confirmText || 'Delete'}
+        onConfirm={confirmAction.onConfirm}
+        onClose={() => setConfirmAction({ ...confirmAction, isOpen: false })}
+      />
     </div>
   );
 };

@@ -2,6 +2,7 @@ from functools import wraps
 from flask import request, jsonify, current_app
 import jwt
 from datetime import datetime, timedelta, timezone
+from app.models import db
 from app.models.user import User
 
 def generate_token(user):
@@ -31,12 +32,15 @@ def get_current_user():
         return None
     token = auth_header.split(' ', 1)[1].strip()
     payload = decode_token(token)
-    if 'error' in payload:
+    if not payload or 'error' in payload:
         return None
-    user_id = payload.get('user_id')
-    user = User.query.get(user_id)
-    if user and user.is_active:
-        return user
+    try:
+        user_id = int(payload.get('user_id'))
+        user = db.session.get(User, user_id)
+        if user and user.is_active:
+            return user
+    except (ValueError, TypeError):
+        return None
     return None
 
 def jwt_required(f):

@@ -12,7 +12,8 @@ import {
   ChevronRight,
   ChevronLeft,
   Building2,
-  CheckCircle2
+  CheckCircle2,
+  Award
 } from 'lucide-react';
 import { publicService } from '../services/api';
 import ExternalRedirectModal from '../components/ExternalRedirectModal';
@@ -504,7 +505,98 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* 4. BSK CENTRE SECTION */}
+      {/* 4. GOVERNMENT WELFARE SCHEMES SECTION */}
+      <section className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#EAF2FC] text-[#2878C8] text-xs font-bold mb-2">
+              <Award className="w-3.5 h-3.5" />
+              <span>West Bengal State Welfare</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-[#173B72]">
+              Government Schemes
+            </h2>
+            <p className="text-sm sm:text-base text-slate-600 mt-1">
+              Discover official welfare programs, verify your eligibility requirements, and access official application portals.
+            </p>
+          </div>
+          <Link
+            to="/schemes"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#2878C8] hover:text-[#173B72] transition-colors shrink-0"
+          >
+            <span>Explore All Schemes</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[
+            {
+              name: 'Lakshmir Bhandar',
+              category: 'Women & Child Welfare',
+              department: 'Women & Child Development and Social Welfare',
+              desc: 'Basic monthly financial assistance of ₹1,000 to ₹1,200 for female heads of household.',
+              slug: 'lakshmir-bhandar'
+            },
+            {
+              name: 'Kanyashree Prakalpa',
+              category: 'Education',
+              department: 'Women & Child Development and Social Welfare',
+              desc: 'Conditional cash transfer scheme to upgrade the status and education of adolescent girls.',
+              slug: 'kanyashree-prakalpa'
+            },
+            {
+              name: 'Swasthya Sathi',
+              category: 'Health',
+              department: 'Health & Family Welfare',
+              desc: 'Basic health cover up to ₹5 Lakh per annum per family for secondary and tertiary care.',
+              slug: 'swasthya-sathi'
+            },
+            {
+              name: 'Krishak Bandhu (Assured Income)',
+              category: 'Agriculture',
+              department: 'Department of Agriculture',
+              desc: 'Financial assistance of up to ₹10,000 per year per acre for agricultural landholders.',
+              slug: 'krishak-bandhu'
+            }
+          ].map((sc, i) => (
+            <div
+              key={i}
+              className="bg-white rounded-xl border border-slate-200 p-6 flex flex-col justify-between hover:border-[#2878C8] hover:shadow-md transition-all group"
+            >
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-[#2878C8] uppercase tracking-wider bg-[#EAF2FC] px-2.5 py-0.5 rounded-full">
+                    {sc.category}
+                  </span>
+                  <Award className="w-4 h-4 text-[#F39A32]" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-[#173B72] group-hover:text-[#2878C8] transition-colors">
+                    {sc.name}
+                  </h3>
+                  <p className="text-[11px] text-slate-400 font-medium mt-0.5">{sc.department}</p>
+                  <p className="text-xs text-slate-600 mt-2 line-clamp-3 leading-relaxed">
+                    {sc.desc}
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-4 mt-4 border-t border-slate-100">
+                <Link
+                  to={`/schemes/${sc.slug}`}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#2878C8] group-hover:text-[#173B72] transition-colors"
+                >
+                  <span>Check Eligibility & Apply</span>
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 5. BSK CENTRE SECTION */}
       <section className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-[#EAF2FC] rounded-2xl border border-blue-100 p-8 sm:p-12 text-center max-w-4xl mx-auto shadow-xs">
           <div className="max-w-2xl mx-auto space-y-4">
