@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { LanguageProvider } from './context/LanguageContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ObservationModal from './components/ObservationModal';
@@ -145,9 +146,11 @@ function MainLayout() {
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <MainLayout />
-      </Router>
+      <LanguageProvider>
+        <Router>
+          <MainLayout />
+        </Router>
+      </LanguageProvider>
     </AuthProvider>
   );
 }
