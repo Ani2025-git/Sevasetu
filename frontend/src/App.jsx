@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, Link } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
+import { WebsiteStatusProvider, useWebsiteStatus } from './context/WebsiteStatusContext';
+import { ShieldAlert, ArrowRight } from 'lucide-react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ObservationModal from './components/ObservationModal';
@@ -20,6 +22,7 @@ import CitizenDashboard from './pages/CitizenDashboard';
 import ObserverDashboard from './pages/ObserverDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import DisclaimerPage from './pages/DisclaimerPage';
+import MaintenancePage from './pages/MaintenancePage';
 
 // Protected Route Helpers
 const AdminRoute = ({ children }) => {
@@ -69,9 +72,52 @@ const CitizenRoute = ({ children }) => {
 
 function MainLayout() {
   const [isObservationModalOpen, setIsObservationModalOpen] = useState(false);
+  const { isMaintenanceMode } = useWebsiteStatus();
+  const { user, isAdmin } = useAuth();
+  const location = useLocation();
+
+  // If Maintenance Mode is active:
+  // 1. Authenticated Admins bypass maintenance mode and see an administrative notification banner.
+  // 2. Unauthenticated visitors can only access /login (to allow admins to sign in).
+  // 3. All other public requests display the Maintenance Page.
+  if (isMaintenanceMode && !isAdmin) {
+    if (location.pathname === '/login') {
+      return (
+        <div className="min-h-screen flex flex-col bg-slate-50 font-sans">
+          <div className="bg-amber-500 text-slate-900 px-4 py-2 text-xs font-bold text-center flex items-center justify-center gap-2">
+            <ShieldAlert className="w-4 h-4 shrink-0" />
+            <span>MAINTENANCE MODE IS ACTIVE — Admin Authentication Portal</span>
+          </div>
+          <main className="flex-1 flex items-center justify-center p-4">
+            <LoginPage />
+          </main>
+        </div>
+      );
+    }
+    return <MaintenancePage />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 font-sans">
+      {/* Floating Admin Bypass Banner when Maintenance Mode is ON */}
+      {isMaintenanceMode && isAdmin && (
+        <div className="bg-gradient-to-r from-amber-600 to-rose-600 text-white px-4 py-2 text-xs font-bold shadow-md sticky top-0 z-50 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <ShieldAlert className="w-4 h-4 animate-pulse shrink-0" />
+            <span>
+              ⚡ MAINTENANCE MODE ACTIVE — Public visitors see the Maintenance Page. You are viewing in Admin Bypass Mode.
+            </span>
+          </div>
+          <Link
+            to="/admin"
+            className="inline-flex items-center gap-1 px-3 py-1 bg-white text-slate-900 hover:bg-slate-100 rounded-md text-[11px] font-bold transition-colors"
+          >
+            <span>Open Website Control</span>
+            <ArrowRight className="w-3 h-3" />
+          </Link>
+        </div>
+      )}
+
       <Navbar onOpenObservationModal={() => setIsObservationModalOpen(true)} />
 
       <main className="flex-1">
@@ -149,11 +195,13 @@ function MainLayout() {
 function App() {
   return (
     <AuthProvider>
-      <LanguageProvider>
-        <Router>
-          <MainLayout />
-        </Router>
-      </LanguageProvider>
+      <WebsiteStatusProvider>
+        <LanguageProvider>
+          <Router>
+            <MainLayout />
+          </Router>
+        </LanguageProvider>
+      </WebsiteStatusProvider>
     </AuthProvider>
   );
 }

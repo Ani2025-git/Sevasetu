@@ -23,8 +23,11 @@ import {
   Search,
   ExternalLink,
   Calendar,
-  Award
+  Award,
+  Power
 } from 'lucide-react';
+import AdminWebsiteControl from '../components/AdminWebsiteControl';
+import { useWebsiteStatus } from '../context/WebsiteStatusContext';
 import {
   BarChart,
   Bar,
@@ -44,6 +47,7 @@ import AdminSchemeManager from '../components/AdminSchemeManager';
 
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
+  const { isMaintenanceMode } = useWebsiteStatus();
   const [activeTab, setActiveTab] = useState('overview');
 
   // Stats & Dashboard
@@ -290,6 +294,13 @@ const AdminDashboard = () => {
 
   const navItems = [
     { id: 'overview', label: 'Overview', icon: BarChart3 },
+    {
+      id: 'website',
+      label: 'Website Control',
+      icon: Power,
+      badge: isMaintenanceMode ? 'OFFLINE' : 'ONLINE',
+      badgeColor: isMaintenanceMode ? 'bg-rose-600 text-white' : 'bg-emerald-600 text-white',
+    },
     { id: 'schemes', label: 'Government Schemes', icon: Award, badge: schemesCount, badgeColor: 'bg-[#2878C8]' },
     { id: 'centres', label: 'Centre Management', icon: Building2, badge: centres.length },
     { id: 'services', label: 'Service Management', icon: FileText, badge: services.length },
@@ -1084,6 +1095,10 @@ const AdminDashboard = () => {
           )}
 
           {/* TAB 9: SETTINGS */}
+          {activeTab === 'website' && (
+            <AdminWebsiteControl />
+          )}
+
           {activeTab === 'settings' && (
             <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
               <div className="pb-4 border-b border-slate-100">

@@ -23,6 +23,50 @@ def health():
         'mode': 'independent-citizen-assistance-platform'
     }), 200
 
+# ---------------- WEBSITE STATUS (MAINTENANCE CHECK) ----------------
+@public_bp.route('/website-status', methods=['GET'])
+def get_website_status():
+    try:
+        from app.models.website_setting import WebsiteSettings
+        settings = WebsiteSettings.get_settings()
+        return jsonify({
+            'success': True,
+            'is_maintenance_mode': settings.is_maintenance_mode,
+            'status': 'OFFLINE' if settings.is_maintenance_mode else 'ONLINE',
+            'titles': {
+                'en': settings.maintenance_title_en or "We'll Be Back Soon",
+                'bn': settings.maintenance_title_bn or "আমরা শীঘ্রই ফিরে আসব",
+                'hi': settings.maintenance_title_hi or "हम जल्द ही वापस आएंगे",
+            },
+            'messages': {
+                'en': settings.maintenance_message_en,
+                'bn': settings.maintenance_message_bn,
+                'hi': settings.maintenance_message_hi,
+            },
+            'estimated_reopening_at': settings.estimated_reopening_at.isoformat() if settings.estimated_reopening_at else None,
+            'support_contact_email': settings.support_contact_email or 'support@sevasetu.org',
+            'updated_at': settings.updated_at.isoformat() if settings.updated_at else None
+        }), 200
+    except Exception as e:
+        return jsonify({
+            'success': True,
+            'is_maintenance_mode': False,
+            'status': 'ONLINE',
+            'titles': {
+                'en': "We'll Be Back Soon",
+                'bn': "আমরা শীঘ্রই ফিরে আসব",
+                'hi': "हम जल्द ही वापस आएंगे",
+            },
+            'messages': {
+                'en': "Seva Setu is temporarily unavailable while we carry out maintenance. Please visit again soon.",
+                'bn': "সেবা সেতু প্ল্যাটফর্মটি সাময়িকভাবে রক্ষণাবেক্ষণের অধীনে রয়েছে। অনুগ্রহ করে শীঘ্রই আবার পরিদর্শন করুন।",
+                'hi': "सेवा सेतु प्लेटफॉर्म अस्थायी रूप से रखरखाव के अधीन है। कृपया जल्द ही पुनः पधारें।",
+            },
+            'estimated_reopening_at': None,
+            'support_contact_email': 'support@sevasetu.org',
+            'fallback': True
+        }), 200
+
 # ---------------- SERVICES ----------------
 @public_bp.route('/services', methods=['GET'])
 def get_all_services():

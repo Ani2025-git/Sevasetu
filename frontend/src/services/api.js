@@ -96,6 +96,7 @@ export const publicService = {
   removeSavedService: (service_id) => api.delete(`/saved-services/${service_id}`),
   submitAnonymousObservation: (data) => api.post('/public/observations', data),
   getDisclaimer: () => api.get('/public/disclaimer'),
+  getWebsiteStatus: () => api.get('/website-status'),
 };
 
 export const observerService = {
@@ -146,6 +147,9 @@ export const adminService = {
   // Settings
   getSettings: () => api.get('/admin/settings'),
   updateSettings: (data) => api.put('/admin/settings', data),
+  // Website Availability Control & Maintenance Mode
+  getWebsiteSettings: () => api.get('/admin/website-settings'),
+  updateWebsiteSettings: (data) => api.put('/admin/website-settings', data),
 };
 
 export default api;

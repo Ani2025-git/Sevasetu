@@ -114,16 +114,16 @@ const SchemesPage = () => {
 
         try {
           const res = await schemeService.getSchemes(params);
-          if (res.data.success && res.data.schemes && res.data.schemes.length > 0) {
+          if (res.data && res.data.success && Array.isArray(res.data.schemes)) {
             setSchemes(res.data.schemes);
-            setTotalCount(res.data.total);
-            setTotalPages(res.data.pages);
+            setTotalCount(res.data.total !== undefined ? res.data.total : res.data.schemes.length);
+            setTotalPages(res.data.pages !== undefined ? res.data.pages : 1);
             setIsFallback(false);
             setLoading(false);
             return;
           }
         } catch (apiErr) {
-          console.warn('Live schemes API unreachable, loading verified state cache:', apiErr);
+          console.warn('Live schemes API unreachable or spinning up, loading verified state cache:', apiErr);
         }
 
         // Verified offline fallback filter
@@ -137,9 +137,9 @@ const SchemesPage = () => {
         if (searchQuery.trim()) {
           const q = searchQuery.toLowerCase().trim();
           filtered = filtered.filter(s =>
-            s.name.toLowerCase().includes(q) ||
-            s.short_description.toLowerCase().includes(q) ||
-            s.beneficiary_summary.toLowerCase().includes(q)
+            (s.name && s.name.toLowerCase().includes(q)) ||
+            (s.short_description && s.short_description.toLowerCase().includes(q)) ||
+            (s.beneficiary_summary && s.beneficiary_summary.toLowerCase().includes(q))
           );
         }
         setSchemes(filtered);
@@ -147,8 +147,11 @@ const SchemesPage = () => {
         setTotalPages(1);
         setIsFallback(true);
       } catch (err) {
-        console.error('Error in schemes loader:', err);
-        setError('Unable to load schemes.');
+        console.error('Error in schemes loader, falling back to static verified schemes:', err);
+        setSchemes(FALLBACK_SCHEMES);
+        setTotalCount(FALLBACK_SCHEMES.length);
+        setTotalPages(1);
+        setIsFallback(true);
       } finally {
         setLoading(false);
       }

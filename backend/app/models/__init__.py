@@ -21,4 +21,5 @@ from app.models.scheme import (
     SchemeVerificationHistory,
     generate_slug
 )
+from app.models.website_setting import WebsiteSettings
 

@@ -989,3 +989,80 @@ def delete_scheme(id):
         }), 200
 
 
+
+
+# ----------------- WEBSITE AVAILABILITY & MAINTENANCE CONTROL -----------------
+@admin_bp.route('/website-settings', methods=['GET'])
+@admin_required
+def get_website_settings():
+    from app.models.website_setting import WebsiteSettings
+    settings = WebsiteSettings.get_settings()
+    audit_logs = AuditLog.query.filter_by(action='WEBSITE_STATUS_CHANGE').order_by(AuditLog.created_at.desc()).limit(20).all()
+    return jsonify({
+        'success': True,
+        'settings': settings.to_dict(),
+        'audit_logs': [l.to_dict() for l in audit_logs]
+    }), 200
+
+@admin_bp.route('/website-settings', methods=['PUT'])
+@admin_required
+def update_website_settings():
+    from app.models.website_setting import WebsiteSettings
+    admin = request.current_user
+    settings = WebsiteSettings.get_settings()
+    data = request.get_json() or {}
+
+    prev_status = 'OFFLINE' if settings.is_maintenance_mode else 'ONLINE'
+    
+    # Update fields if provided
+    if 'is_maintenance_mode' in data:
+        settings.is_maintenance_mode = bool(data['is_maintenance_mode'])
+
+    if 'maintenance_title_en' in data:
+        settings.maintenance_title_en = sanitize_text(data['maintenance_title_en'])
+    if 'maintenance_title_bn' in data:
+        settings.maintenance_title_bn = sanitize_text(data['maintenance_title_bn'])
+    if 'maintenance_title_hi' in data:
+        settings.maintenance_title_hi = sanitize_text(data['maintenance_title_hi'])
+
+    if 'maintenance_message_en' in data:
+        settings.maintenance_message_en = sanitize_text(data['maintenance_message_en'])
+    if 'maintenance_message_bn' in data:
+        settings.maintenance_message_bn = sanitize_text(data['maintenance_message_bn'])
+    if 'maintenance_message_hi' in data:
+        settings.maintenance_message_hi = sanitize_text(data['maintenance_message_hi'])
+
+    if 'support_contact_email' in data:
+        settings.support_contact_email = sanitize_text(data['support_contact_email'])
+
+    if 'estimated_reopening_at' in data:
+        val = data['estimated_reopening_at']
+        if val:
+            try:
+                val_clean = val.replace('Z', '+00:00')
+                settings.estimated_reopening_at = datetime.fromisoformat(val_clean)
+            except Exception:
+                pass
+        else:
+            settings.estimated_reopening_at = None
+
+    new_status = 'OFFLINE' if settings.is_maintenance_mode else 'ONLINE'
+    reason = sanitize_text(data.get('reason', '')).strip()
+
+    settings.updated_by = admin.id
+    settings.updated_at = datetime.utcnow()
+    db.session.commit()
+
+    if prev_status != new_status:
+        details = f"Admin {admin.name} toggled public website status from {prev_status} to {new_status}."
+        if reason:
+            details += f" Reason: {reason}"
+        log_audit(admin.id, 'WEBSITE_STATUS_CHANGE', 'WebsiteSettings', str(settings.id), details)
+    else:
+        log_audit(admin.id, 'UPDATE_WEBSITE_SETTINGS', 'WebsiteSettings', str(settings.id), f"Admin {admin.name} updated maintenance messages and schedule.")
+
+    return jsonify({
+        'success': True,
+        'message': f"Website status is now {new_status}.",
+        'settings': settings.to_dict()
+    }), 200

@@ -14,7 +14,9 @@ with app.app_context():
     try:
         from app.models.centre import Centre
         from app.models.scheme import GovernmentScheme
+        from app.models.website_setting import WebsiteSettings
         db.create_all()
+        WebsiteSettings.get_settings()
         from seed import ensure_demo_users, seed_database, seed_schemes
         ensure_demo_users()
         if Centre.query.count() == 0:
