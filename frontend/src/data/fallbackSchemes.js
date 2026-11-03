@@ -526,3 +526,4 @@ export const FALLBACK_SCHEMES = [
     ]
   }
 ];
+

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { ExternalLink } from 'lucide-react';
 
 const Footer = () => {
   return (
@@ -34,6 +35,11 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
+                <Link to="/schemes" className="text-slate-600 hover:text-[#2878C8] transition-colors">
+                  Government Schemes
+                </Link>
+              </li>
+              <li>
                 <Link to="/centre" className="text-slate-600 hover:text-[#2878C8] transition-colors">
                   BSK Centres
                 </Link>
@@ -64,8 +70,44 @@ const Footer = () => {
           </div>
         </div>
 
+        {/* Developer Credit */}
+        <div className="mt-10 pt-6 border-t border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4 text-xs">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 text-center sm:text-left">
+            <span className="text-slate-700 font-medium">
+              Developed by{' '}
+              <a
+                href="https://ani2025-git.github.io/my-portfolio/"
+                target="_blank"
+                rel="noopener noreferrer"
+                translate="no"
+                className="font-bold text-[#173B72] hover:text-[#2878C8] transition-colors underline decoration-slate-300 hover:decoration-[#2878C8] underline-offset-2 notranslate"
+              >
+                Animesh Mishra
+              </a>
+            </span>
+            <span className="hidden sm:inline text-slate-300">•</span>
+            <span className="text-slate-500 font-normal">
+              Frontend Developer &amp; UI Engineer
+            </span>
+          </div>
+
+          <div className="flex items-center gap-1.5 text-center">
+            <span className="text-slate-500 font-medium">Portfolio:</span>
+            <a
+              href="https://ani2025-git.github.io/my-portfolio/"
+              target="_blank"
+              rel="noopener noreferrer"
+              translate="no"
+              className="inline-flex items-center gap-1 text-[#2878C8] hover:text-[#173B72] font-semibold transition-colors underline decoration-blue-200 hover:decoration-[#173B72] underline-offset-2 notranslate break-all"
+            >
+              <span>https://ani2025-git.github.io/my-portfolio/</span>
+              <ExternalLink className="w-3 h-3 shrink-0" />
+            </a>
+          </div>
+        </div>
+
         {/* Bottom Bar */}
-        <div className="mt-12 pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-3">
+        <div className="mt-6 pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-3">
           <p>© {new Date().getFullYear()} Seva Setu. Independent citizen service platform for West Bengal.</p>
           <div className="flex items-center gap-4">
             <Link to="/disclaimer" className="hover:text-[#173B72] transition-colors">Disclaimer</Link>
