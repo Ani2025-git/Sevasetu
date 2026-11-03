@@ -11,4 +11,14 @@ from app.models.audit_log import AuditLog
 from app.models.saved_service import SavedService
 from app.models.observation import Observation
 from app.models.queue_update import QueueUpdate
+from app.models.scheme import (
+    SchemeCategory,
+    SchemeDepartment,
+    GovernmentScheme,
+    SchemeEligibilityRule,
+    SchemeRequiredDocument,
+    SchemeOfficialSource,
+    SchemeVerificationHistory,
+    generate_slug
+)
 

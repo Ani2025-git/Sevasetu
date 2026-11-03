@@ -19,12 +19,16 @@ app = create_app()
 with app.app_context():
     try:
         from app.models.centre import Centre
+        from app.models.scheme import GovernmentScheme
         db.create_all()
-        from seed import ensure_demo_users, seed_database
+        from seed import ensure_demo_users, seed_database, seed_schemes
         ensure_demo_users()
         if Centre.query.count() == 0:
             seed_database(drop_existing=False)
             print("Auto-seeded database in serverless environment.")
+        elif GovernmentScheme.query.count() == 0:
+            seed_schemes()
+            print("Auto-seeded government schemes in serverless environment.")
     except Exception as e:
         print(f"Serverless DB setup check: {e}")
 

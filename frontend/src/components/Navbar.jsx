@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Menu, X, LogOut } from 'lucide-react';
+import { Menu, X, LogOut, Award } from 'lucide-react';
 
 const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -39,6 +39,12 @@ const Navbar = () => {
           </NavLink>
           <NavLink to="/services" className={navLinkClass}>
             Services
+          </NavLink>
+          <NavLink to="/schemes" className={navLinkClass}>
+            <span className="inline-flex items-center gap-1.5">
+              <Award className="w-3.5 h-3.5 text-saffron shrink-0" />
+              <span>Schemes</span>
+            </span>
           </NavLink>
           <NavLink to="/centre" className={navLinkClass}>
             BSK Centres
@@ -116,6 +122,16 @@ const Navbar = () => {
             className={navLinkClass}
           >
             Services
+          </NavLink>
+          <NavLink
+            to="/schemes"
+            onClick={() => setMobileMenuOpen(false)}
+            className={navLinkClass}
+          >
+            <span className="flex items-center gap-2">
+              <Award className="w-4 h-4 text-saffron shrink-0" />
+              <span>Schemes</span>
+            </span>
           </NavLink>
           <NavLink
             to="/centre"

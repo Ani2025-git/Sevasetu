@@ -22,7 +22,8 @@ import {
   RefreshCw,
   Search,
   ExternalLink,
-  Calendar
+  Calendar,
+  Award
 } from 'lucide-react';
 import {
   BarChart,
@@ -39,6 +40,7 @@ import { adminService, publicService } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import QueueBadge from '../components/QueueBadge';
 import ConfirmModal from '../components/ConfirmModal';
+import AdminSchemeManager from '../components/AdminSchemeManager';
 
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
@@ -52,6 +54,7 @@ const AdminDashboard = () => {
   // Data lists
   const [centres, setCentres] = useState([]);
   const [services, setServices] = useState([]);
+  const [schemesCount, setSchemesCount] = useState(0);
   const [observations, setObservations] = useState([]);
   const [historyList, setHistoryList] = useState([]);
   const [auditLogs, setAuditLogs] = useState([]);
@@ -287,6 +290,7 @@ const AdminDashboard = () => {
 
   const navItems = [
     { id: 'overview', label: 'Overview', icon: BarChart3 },
+    { id: 'schemes', label: 'Government Schemes', icon: Award, badge: schemesCount, badgeColor: 'bg-[#2878C8]' },
     { id: 'centres', label: 'Centre Management', icon: Building2, badge: centres.length },
     { id: 'services', label: 'Service Management', icon: FileText, badge: services.length },
     { id: 'queue', label: 'Queue Publishing', icon: Clock },
@@ -657,6 +661,11 @@ const AdminDashboard = () => {
                 ))}
               </div>
             </div>
+          )}
+
+          {/* TAB: GOVERNMENT SCHEMES */}
+          {activeTab === 'schemes' && (
+            <AdminSchemeManager onSchemeUpdate={(count) => setSchemesCount(count)} />
           )}
 
           {/* TAB 3: SERVICES */}

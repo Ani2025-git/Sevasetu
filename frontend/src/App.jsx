@@ -10,6 +10,8 @@ import HomePage from './pages/HomePage';
 import CentreDetailsPage from './pages/CentreDetailsPage';
 import ServicesPage from './pages/ServicesPage';
 import ServiceDetailsPage from './pages/ServiceDetailsPage';
+import SchemesPage from './pages/SchemesPage';
+import SchemeDetailsPage from './pages/SchemeDetailsPage';
 import QueueStatusPage from './pages/QueueStatusPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -83,6 +85,8 @@ function MainLayout() {
           />
           <Route path="/services" element={<ServicesPage />} />
           <Route path="/services/:id" element={<ServiceDetailsPage />} />
+          <Route path="/schemes" element={<SchemesPage />} />
+          <Route path="/schemes/:slug" element={<SchemeDetailsPage />} />
           <Route
             path="/queue"
             element={<QueueStatusPage onOpenObservationModal={() => setIsObservationModalOpen(true)} />}

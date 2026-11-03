@@ -8,6 +8,16 @@ from app.models.observation import Observation
 from app.models.queue_update import QueueUpdate
 from app.models.audit_log import AuditLog
 from app.models.setting import Setting
+from app.models.scheme import (
+    GovernmentScheme,
+    SchemeCategory,
+    SchemeDepartment,
+    SchemeEligibilityRule,
+    SchemeRequiredDocument,
+    SchemeOfficialSource,
+    SchemeVerificationHistory,
+    generate_slug
+)
 from app.middleware.auth import admin_required
 from app.services.audit_service import log_audit
 from app.services.queue_service import compute_centre_queue_status, get_stale_threshold_minutes
@@ -477,4 +487,463 @@ def update_settings():
             'allow_anonymous_observations': Setting.get('allow_anonymous_observations', 'true').lower() == 'true'
         }
     }), 200
+
+# ----------------- GOVERNMENT SCHEMES MANAGEMENT -----------------
+@admin_bp.route('/schemes', methods=['GET'])
+@admin_required
+def get_admin_schemes():
+    try:
+        query = GovernmentScheme.query
+        status = request.args.get('status')
+        category_id = request.args.get('category_id')
+        search = request.args.get('search')
+        page = max(1, int(request.args.get('page', 1)))
+        per_page = min(100, max(1, int(request.args.get('per_page', 20))))
+
+        if status and status.upper() != 'ALL':
+            query = query.filter_by(status=status.upper())
+
+        if category_id:
+            try:
+                query = query.filter_by(category_id=int(category_id))
+            except ValueError:
+                pass
+
+        if search:
+            s_clean = sanitize_text(search).strip()
+            if s_clean:
+                s_term = f"%{s_clean}%"
+                query = query.filter(
+                    (GovernmentScheme.name.ilike(s_term)) |
+                    (GovernmentScheme.slug.ilike(s_term)) |
+                    (GovernmentScheme.beneficiary_summary.ilike(s_term))
+                )
+
+        total = query.count()
+        schemes = query.order_by(GovernmentScheme.updated_at.desc()).offset((page - 1) * per_page).limit(per_page).all()
+
+        # Count by status for quick filter badges
+        status_counts = {
+            'ALL': GovernmentScheme.query.count(),
+            'DRAFT': GovernmentScheme.query.filter_by(status='DRAFT').count(),
+            'PENDING_VERIFICATION': GovernmentScheme.query.filter_by(status='PENDING_VERIFICATION').count(),
+            'VERIFIED': GovernmentScheme.query.filter_by(status='VERIFIED').count(),
+            'PUBLISHED': GovernmentScheme.query.filter_by(status='PUBLISHED').count(),
+            'ARCHIVED': GovernmentScheme.query.filter_by(status='ARCHIVED').count(),
+        }
+
+        return jsonify({
+            'success': True,
+            'schemes': [s.to_dict(include_details=False) for s in schemes],
+            'total': total,
+            'page': page,
+            'pages': (total + per_page - 1) // per_page if total > 0 else 1,
+            'per_page': per_page,
+            'status_counts': status_counts
+        }), 200
+    except Exception as e:
+        return jsonify({'success': False, 'message': 'Failed to load schemes', 'detail': str(e)}), 500
+
+@admin_bp.route('/schemes/<int:id>', methods=['GET'])
+@admin_required
+def get_admin_scheme_details(id):
+    scheme = GovernmentScheme.query.get(id)
+    if not scheme:
+        return jsonify({'success': False, 'message': 'Scheme not found'}), 404
+    return jsonify({
+        'success': True,
+        'scheme': scheme.to_dict(include_details=True)
+    }), 200
+
+@admin_bp.route('/schemes', methods=['POST'])
+@admin_required
+def create_scheme():
+    admin = request.current_user
+    data = request.get_json() or {}
+
+    name = sanitize_text(data.get('name', '')).strip()
+    short_desc = sanitize_text(data.get('short_description', '')).strip()
+    full_desc = sanitize_text(data.get('full_description', '')).strip()
+    category_id = data.get('category_id')
+
+    if not name or not short_desc or not full_desc or not category_id:
+        return jsonify({'success': False, 'message': 'Name, short description, full description, and category are required.'}), 400
+
+    # Ensure category exists
+    cat = SchemeCategory.query.get(category_id)
+    if not cat:
+        return jsonify({'success': False, 'message': 'Selected category does not exist.'}), 400
+
+    # Generate or sanitize slug
+    custom_slug = sanitize_text(data.get('slug', '')).strip().lower()
+    base_slug = generate_slug(custom_slug or name)
+    slug = base_slug
+    counter = 1
+    while GovernmentScheme.query.filter_by(slug=slug).first():
+        slug = f"{base_slug}-{counter}"
+        counter += 1
+
+    department_id = data.get('department_id') or None
+    beneficiary_summary = sanitize_text(data.get('beneficiary_summary', '')).strip()
+    app_instructions = sanitize_text(data.get('application_instructions', '')).strip()
+    official_apply_url = sanitize_text(data.get('official_application_url', '')).strip() or None
+    official_info_url = sanitize_text(data.get('official_info_url', '')).strip() or None
+
+    initial_status = data.get('status', 'DRAFT').upper()
+    if initial_status not in ['DRAFT', 'PENDING_VERIFICATION', 'VERIFIED', 'PUBLISHED', 'ARCHIVED']:
+        initial_status = 'DRAFT'
+
+    scheme = GovernmentScheme(
+        name=name,
+        slug=slug,
+        short_description=short_desc,
+        full_description=full_desc,
+        category_id=category_id,
+        department_id=department_id,
+        beneficiary_summary=beneficiary_summary,
+        application_instructions=app_instructions,
+        official_application_url=official_apply_url,
+        official_info_url=official_info_url,
+        status=initial_status,
+        verification_status='VERIFIED' if initial_status == 'PUBLISHED' else initial_status,
+        last_verified_at=datetime.utcnow() if initial_status in ['VERIFIED', 'PUBLISHED'] else None,
+        created_by=admin.id,
+        updated_by=admin.id
+    )
+    db.session.add(scheme)
+    db.session.flush()
+
+    # Add Eligibility Rules if provided
+    rules_data = data.get('eligibility_rules', [])
+    for r in rules_data:
+        desc = sanitize_text(r.get('rule_description', '')).strip()
+        if desc:
+            rule = SchemeEligibilityRule(
+                scheme_id=scheme.id,
+                rule_type=r.get('rule_type', 'GENERAL'),
+                rule_description=desc,
+                minimum_age=int(r['minimum_age']) if r.get('minimum_age') not in [None, ''] else None,
+                maximum_age=int(r['maximum_age']) if r.get('maximum_age') not in [None, ''] else None,
+                minimum_income=float(r['minimum_income']) if r.get('minimum_income') not in [None, ''] else None,
+                maximum_income=float(r['maximum_income']) if r.get('maximum_income') not in [None, ''] else None,
+                residence_requirement=sanitize_text(r.get('residence_requirement', '')).strip() or None,
+                occupation_requirement=sanitize_text(r.get('occupation_requirement', '')).strip() or None,
+                is_mandatory=bool(r.get('is_mandatory', True))
+            )
+            db.session.add(rule)
+
+    # Add Required Documents if provided
+    docs_data = data.get('required_documents', [])
+    for d in docs_data:
+        doc_name = sanitize_text(d.get('document_name', '')).strip()
+        if doc_name:
+            doc = SchemeRequiredDocument(
+                scheme_id=scheme.id,
+                document_name=doc_name,
+                description=sanitize_text(d.get('description', '')).strip() or None,
+                is_mandatory=bool(d.get('is_mandatory', True)),
+                source_reference=sanitize_text(d.get('source_reference', '')).strip() or None
+            )
+            db.session.add(doc)
+
+    # Add Official Sources if provided
+    sources_data = data.get('official_sources', [])
+    for s in sources_data:
+        s_title = sanitize_text(s.get('source_title', '')).strip()
+        s_url = sanitize_text(s.get('source_url', '')).strip()
+        if s_title and s_url:
+            source = SchemeOfficialSource(
+                scheme_id=scheme.id,
+                source_title=s_title,
+                source_url=s_url,
+                source_department=sanitize_text(s.get('source_department', '')).strip() or None,
+                source_type=s.get('source_type', 'OFFICIAL_PORTAL'),
+                verified_at=datetime.utcnow()
+            )
+            db.session.add(source)
+
+    # Initial history record
+    history = SchemeVerificationHistory(
+        scheme_id=scheme.id,
+        admin_id=admin.id,
+        previous_status='NEW',
+        new_status=scheme.status,
+        notes=f"Scheme created by {admin.name} ({admin.email}) with status {scheme.status}."
+    )
+    db.session.add(history)
+    db.session.commit()
+
+    log_audit(admin.id, 'CREATE_SCHEME', 'GovernmentScheme', scheme.id, f"Created scheme {scheme.name} (slug: {scheme.slug})")
+
+    return jsonify({
+        'success': True,
+        'message': f"Scheme '{scheme.name}' created successfully.",
+        'scheme': scheme.to_dict(include_details=True)
+    }), 201
+
+@admin_bp.route('/schemes/<int:id>', methods=['PUT'])
+@admin_required
+def update_scheme(id):
+    admin = request.current_user
+    scheme = GovernmentScheme.query.get(id)
+    if not scheme:
+        return jsonify({'success': False, 'message': 'Scheme not found'}), 404
+
+    data = request.get_json() or {}
+
+    if 'name' in data:
+        name = sanitize_text(data['name']).strip()
+        if name:
+            scheme.name = name
+
+    if 'short_description' in data:
+        scheme.short_description = sanitize_text(data['short_description']).strip()
+
+    if 'full_description' in data:
+        scheme.full_description = sanitize_text(data['full_description']).strip()
+
+    if 'category_id' in data:
+        cat = SchemeCategory.query.get(data['category_id'])
+        if cat:
+            scheme.category_id = cat.id
+
+    if 'department_id' in data:
+        scheme.department_id = data['department_id'] or None
+
+    if 'beneficiary_summary' in data:
+        scheme.beneficiary_summary = sanitize_text(data['beneficiary_summary']).strip()
+
+    if 'application_instructions' in data:
+        scheme.application_instructions = sanitize_text(data['application_instructions']).strip()
+
+    if 'official_application_url' in data:
+        scheme.official_application_url = sanitize_text(data['official_application_url']).strip() or None
+
+    if 'official_info_url' in data:
+        scheme.official_info_url = sanitize_text(data['official_info_url']).strip() or None
+
+    # Update Rules if provided
+    if 'eligibility_rules' in data:
+        SchemeEligibilityRule.query.filter_by(scheme_id=scheme.id).delete()
+        for r in data['eligibility_rules']:
+            desc = sanitize_text(r.get('rule_description', '')).strip()
+            if desc:
+                rule = SchemeEligibilityRule(
+                    scheme_id=scheme.id,
+                    rule_type=r.get('rule_type', 'GENERAL'),
+                    rule_description=desc,
+                    minimum_age=int(r['minimum_age']) if r.get('minimum_age') not in [None, ''] else None,
+                    maximum_age=int(r['maximum_age']) if r.get('maximum_age') not in [None, ''] else None,
+                    minimum_income=float(r['minimum_income']) if r.get('minimum_income') not in [None, ''] else None,
+                    maximum_income=float(r['maximum_income']) if r.get('maximum_income') not in [None, ''] else None,
+                    residence_requirement=sanitize_text(r.get('residence_requirement', '')).strip() or None,
+                    occupation_requirement=sanitize_text(r.get('occupation_requirement', '')).strip() or None,
+                    is_mandatory=bool(r.get('is_mandatory', True))
+                )
+                db.session.add(rule)
+
+    # Update Documents if provided
+    if 'required_documents' in data:
+        SchemeRequiredDocument.query.filter_by(scheme_id=scheme.id).delete()
+        for d in data['required_documents']:
+            doc_name = sanitize_text(d.get('document_name', '')).strip()
+            if doc_name:
+                doc = SchemeRequiredDocument(
+                    scheme_id=scheme.id,
+                    document_name=doc_name,
+                    description=sanitize_text(d.get('description', '')).strip() or None,
+                    is_mandatory=bool(d.get('is_mandatory', True)),
+                    source_reference=sanitize_text(d.get('source_reference', '')).strip() or None
+                )
+                db.session.add(doc)
+
+    # Update Sources if provided
+    if 'official_sources' in data:
+        SchemeOfficialSource.query.filter_by(scheme_id=scheme.id).delete()
+        for s in data['official_sources']:
+            s_title = sanitize_text(s.get('source_title', '')).strip()
+            s_url = sanitize_text(s.get('source_url', '')).strip()
+            if s_title and s_url:
+                source = SchemeOfficialSource(
+                    scheme_id=scheme.id,
+                    source_title=s_title,
+                    source_url=s_url,
+                    source_department=sanitize_text(s.get('source_department', '')).strip() or None,
+                    source_type=s.get('source_type', 'OFFICIAL_PORTAL'),
+                    verified_at=datetime.utcnow()
+                )
+                db.session.add(source)
+
+    scheme.updated_by = admin.id
+    scheme.updated_at = datetime.utcnow()
+    db.session.commit()
+
+    log_audit(admin.id, 'UPDATE_SCHEME', 'GovernmentScheme', scheme.id, f"Updated scheme {scheme.name}")
+
+    return jsonify({
+        'success': True,
+        'message': f"Scheme '{scheme.name}' updated successfully.",
+        'scheme': scheme.to_dict(include_details=True)
+    }), 200
+
+@admin_bp.route('/schemes/<int:id>/status', methods=['PATCH'])
+@admin_required
+def update_scheme_status(id):
+    admin = request.current_user
+    scheme = GovernmentScheme.query.get(id)
+    if not scheme:
+        return jsonify({'success': False, 'message': 'Scheme not found'}), 404
+
+    data = request.get_json() or {}
+    new_status = data.get('status', '').upper()
+    notes = sanitize_text(data.get('notes', '')).strip()
+
+    valid_statuses = ['DRAFT', 'PENDING_VERIFICATION', 'VERIFIED', 'PUBLISHED', 'ARCHIVED']
+    if new_status not in valid_statuses:
+        return jsonify({'success': False, 'message': f"Invalid status. Must be one of {valid_statuses}."}), 400
+
+    old_status = scheme.status
+    scheme.status = new_status
+    scheme.verification_status = 'VERIFIED' if new_status in ['VERIFIED', 'PUBLISHED'] else new_status
+    if new_status in ['VERIFIED', 'PUBLISHED']:
+        scheme.last_verified_at = datetime.utcnow()
+
+    scheme.updated_by = admin.id
+    scheme.updated_at = datetime.utcnow()
+
+    history = SchemeVerificationHistory(
+        scheme_id=scheme.id,
+        admin_id=admin.id,
+        previous_status=old_status,
+        new_status=new_status,
+        notes=notes or f"Status transitioned from {old_status} to {new_status} by {admin.name}."
+    )
+    db.session.add(history)
+    db.session.commit()
+
+    log_audit(admin.id, 'UPDATE_SCHEME_STATUS', 'GovernmentScheme', scheme.id, f"Status changed from {old_status} to {new_status}")
+
+    return jsonify({
+        'success': True,
+        'message': f"Scheme status updated to {new_status}.",
+        'scheme': scheme.to_dict(include_details=True)
+    }), 200
+
+@admin_bp.route('/schemes/<int:id>/submit-verification', methods=['POST'])
+@admin_required
+def submit_scheme_verification(id):
+    admin = request.current_user
+    scheme = GovernmentScheme.query.get(id)
+    if not scheme:
+        return jsonify({'success': False, 'message': 'Scheme not found'}), 404
+
+    data = request.get_json() or {}
+    notes = sanitize_text(data.get('notes', 'Submitted for official verification.')).strip()
+
+    old_status = scheme.status
+    scheme.status = 'PENDING_VERIFICATION'
+    scheme.verification_status = 'PENDING_VERIFICATION'
+    scheme.updated_by = admin.id
+    scheme.updated_at = datetime.utcnow()
+
+    history = SchemeVerificationHistory(
+        scheme_id=scheme.id,
+        admin_id=admin.id,
+        previous_status=old_status,
+        new_status='PENDING_VERIFICATION',
+        notes=notes
+    )
+    db.session.add(history)
+    db.session.commit()
+
+    return jsonify({
+        'success': True,
+        'message': f"Scheme '{scheme.name}' submitted for verification.",
+        'scheme': scheme.to_dict(include_details=True)
+    }), 200
+
+@admin_bp.route('/schemes/<int:id>/publish', methods=['POST'])
+@admin_required
+def publish_scheme(id):
+    admin = request.current_user
+    scheme = GovernmentScheme.query.get(id)
+    if not scheme:
+        return jsonify({'success': False, 'message': 'Scheme not found'}), 404
+
+    data = request.get_json() or {}
+    notes = sanitize_text(data.get('notes', 'Published to live citizen directory after verifying official government source.')).strip()
+
+    old_status = scheme.status
+    scheme.status = 'PUBLISHED'
+    scheme.verification_status = 'VERIFIED'
+    scheme.last_verified_at = datetime.utcnow()
+    scheme.updated_by = admin.id
+    scheme.updated_at = datetime.utcnow()
+
+    history = SchemeVerificationHistory(
+        scheme_id=scheme.id,
+        admin_id=admin.id,
+        previous_status=old_status,
+        new_status='PUBLISHED',
+        notes=notes
+    )
+    db.session.add(history)
+    db.session.commit()
+
+    log_audit(admin.id, 'PUBLISH_SCHEME', 'GovernmentScheme', scheme.id, f"Published scheme {scheme.name}")
+
+    return jsonify({
+        'success': True,
+        'message': f"Scheme '{scheme.name}' is now live and published to citizens.",
+        'scheme': scheme.to_dict(include_details=True)
+    }), 200
+
+@admin_bp.route('/schemes/<int:id>/archive', methods=['POST'])
+@admin_required
+def archive_scheme(id):
+    admin = request.current_user
+    scheme = GovernmentScheme.query.get(id)
+    if not scheme:
+        return jsonify({'success': False, 'message': 'Scheme not found'}), 404
+
+    data = request.get_json() or {}
+    notes = sanitize_text(data.get('notes', 'Archived scheme.')).strip()
+
+    old_status = scheme.status
+    scheme.status = 'ARCHIVED'
+    scheme.verification_status = 'ARCHIVED'
+    scheme.updated_by = admin.id
+    scheme.updated_at = datetime.utcnow()
+
+    history = SchemeVerificationHistory(
+        scheme_id=scheme.id,
+        admin_id=admin.id,
+        previous_status=old_status,
+        new_status='ARCHIVED',
+        notes=notes
+    )
+    db.session.add(history)
+    db.session.commit()
+
+    log_audit(admin.id, 'ARCHIVE_SCHEME', 'GovernmentScheme', scheme.id, f"Archived scheme {scheme.name}")
+
+    return jsonify({
+        'success': True,
+        'message': f"Scheme '{scheme.name}' has been archived and removed from citizen view.",
+        'scheme': scheme.to_dict(include_details=True)
+    }), 200
+
+@admin_bp.route('/schemes/<int:id>/history', methods=['GET'])
+@admin_required
+def get_scheme_history(id):
+    scheme = GovernmentScheme.query.get(id)
+    if not scheme:
+        return jsonify({'success': False, 'message': 'Scheme not found'}), 404
+
+    history = SchemeVerificationHistory.query.filter_by(scheme_id=scheme.id).order_by(SchemeVerificationHistory.created_at.desc()).all()
+    return jsonify({
+        'success': True,
+        'history': [h.to_dict() for h in history]
+    }), 200
+
 

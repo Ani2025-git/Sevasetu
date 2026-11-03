@@ -103,6 +103,13 @@ export const observerService = {
   getMyObservations: () => api.get('/observations/my'),
 };
 
+export const schemeService = {
+  getSchemes: (params) => api.get('/schemes', { params }),
+  getCategories: () => api.get('/schemes/categories'),
+  getDepartments: () => api.get('/schemes/departments'),
+  getScheme: (slug, params) => api.get(`/schemes/${slug}`, { params }),
+};
+
 export const adminService = {
   getDashboard: () => api.get('/admin/dashboard'),
   // Centres
@@ -113,6 +120,16 @@ export const adminService = {
   createService: (data) => api.post('/admin/services', data),
   updateService: (id, data) => api.put(`/admin/services/${id}`, data),
   deleteService: (id) => api.delete(`/admin/services/${id}`),
+  // Government Schemes
+  getSchemes: (params) => api.get('/admin/schemes', { params }),
+  getScheme: (id) => api.get(`/admin/schemes/${id}`),
+  createScheme: (data) => api.post('/admin/schemes', data),
+  updateScheme: (id, data) => api.put(`/admin/schemes/${id}`, data),
+  updateSchemeStatus: (id, data) => api.patch(`/admin/schemes/${id}/status`, data),
+  submitSchemeVerification: (id, data) => api.post(`/admin/schemes/${id}/submit-verification`, data),
+  publishScheme: (id, data) => api.post(`/admin/schemes/${id}/publish`, data),
+  archiveScheme: (id, data) => api.post(`/admin/schemes/${id}/archive`, data),
+  getSchemeHistory: (id) => api.get(`/admin/schemes/${id}/history`),
   // Observations review
   getObservations: (params) => api.get('/admin/observations', { params }),
   reviewObservation: (id, data) => api.post(`/admin/observations/${id}/review`, data),

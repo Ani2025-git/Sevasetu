@@ -16,11 +16,13 @@ def create_app(config_class=Config):
     from app.routes.public import public_bp
     from app.routes.observer import observer_bp
     from app.routes.admin import admin_bp
+    from app.routes.schemes import schemes_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(public_bp)
     app.register_blueprint(observer_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(schemes_bp)
 
     # Error handlers
     @app.errorhandler(404)
