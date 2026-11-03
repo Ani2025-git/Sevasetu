@@ -89,7 +89,7 @@ const Navbar = () => {
   const currentLangObj = languages.find((l) => l.code === language) || languages[0];
 
   const desktopNavLinkClass = ({ isActive }) =>
-    `text-sm font-medium transition-colors px-3 py-2 rounded-lg ${
+    `text-xs lg:text-sm font-medium transition-colors px-2 lg:px-3 py-1.5 lg:py-2 rounded-lg whitespace-nowrap ${
       isActive
         ? 'text-[#173B72] font-semibold bg-[#EAF2FC]'
         : 'text-[#263445] hover:text-[#173B72] hover:bg-slate-100'

@@ -8,11 +8,11 @@ export const SUPPORTED_LANGUAGES = [
 
 const TRANSLATIONS = {
   home: { en: 'Home', bn: 'হোম', hi: 'होम' },
-  services: { en: 'Services', bn: 'পরিষেবাসমূহ', hi: 'सेवाएं' },
+  services: { en: 'Services', bn: 'পরিষেবা', hi: 'सेवाएं' },
   schemes: { en: 'Schemes', bn: 'প্রকল্প', hi: 'योजनाएं' },
   centres: { en: 'BSK Centres', bn: 'বিএসকে কেন্দ্র', hi: 'बीएसके केंद्र' },
   about: { en: 'About', bn: 'সম্পর্কে', hi: 'परिचय' },
-  login: { en: 'Login', bn: 'লগইন', hi: 'लॉग ইন' },
+  login: { en: 'Login', bn: 'লগইন', hi: 'लॉग इन' },
   register: { en: 'Register', bn: 'নিবন্ধন', hi: 'पंजीकरण' },
   dashboard: { en: 'Dashboard', bn: 'ড্যাশবোর্ড', hi: 'डैशबोर्ड' },
   citizenDashboard: { en: 'Citizen Dashboard', bn: 'নাগরিক ড্যাশবোর্ড', hi: 'नागरिक डैशबोर्ड' },
@@ -56,7 +56,6 @@ export const LanguageProvider = ({ children }) => {
     if (typeof document !== 'undefined') {
       document.documentElement.lang = code;
     }
-    // Dispatch event for any other listeners
     try {
       window.dispatchEvent(new CustomEvent('sevasetu:languagechange', { detail: { language: code } }));
     } catch (e) {}

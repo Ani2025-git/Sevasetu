@@ -84,6 +84,9 @@ function MainLayout() {
             path="/centre"
             element={<CentreDetailsPage onOpenObservationModal={() => setIsObservationModalOpen(true)} />}
           />
+          <Route path="/bsk-centres" element={<Navigate to="/centre" replace />} />
+          <Route path="/centres" element={<Navigate to="/centre" replace />} />
+          <Route path="/about" element={<Navigate to="/disclaimer" replace />} />
           <Route path="/services" element={<ServicesPage />} />
           <Route path="/services/:id" element={<ServiceDetailsPage />} />
           <Route path="/schemes" element={<SchemesPage />} />
