@@ -44,3 +44,6 @@ def create_app(config_class=Config):
 
     return app
 
+# Default application instance for WSGI servers (e.g. gunicorn app:app)
+app = create_app()
+

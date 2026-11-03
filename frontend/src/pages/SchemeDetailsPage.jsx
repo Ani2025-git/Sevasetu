@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { schemeService } from '../services/api';
 import ExternalRedirectModal from '../components/ExternalRedirectModal';
+import { FALLBACK_SCHEMES } from '../data/fallbackSchemes';
 
 const SchemeDetailsPage = () => {
   const { slug } = useParams();
@@ -49,9 +50,27 @@ const SchemeDetailsPage = () => {
       try {
         setLoading(true);
         setError(null);
-        const res = await schemeService.getScheme(slug);
-        if (res.data.success) {
-          setScheme(res.data.scheme);
+
+        let data = null;
+        try {
+          const res = await schemeService.getScheme(slug);
+          if (res.data.success && res.data.scheme) {
+            data = res.data.scheme;
+          }
+        } catch (apiErr) {
+          console.warn('Live scheme API unreachable, checking verified offline cache:', apiErr);
+        }
+
+        if (!data) {
+          // Check verified offline cache
+          const match = FALLBACK_SCHEMES.find((s) => s.slug === slug);
+          if (match) {
+            data = match;
+          }
+        }
+
+        if (data) {
+          setScheme(data);
 
           // Restore checklist progress from localStorage
           try {
@@ -63,7 +82,7 @@ const SchemeDetailsPage = () => {
             console.error('Error loading checklist progress:', e);
           }
         } else {
-          setError(res.data.message || 'Scheme details not found');
+          setError('Government scheme details could not be found or are not yet published.');
         }
       } catch (err) {
         console.error('Error fetching scheme details:', err);

@@ -14,7 +14,8 @@ from app.utils.validators import sanitize_text
 schemes_bp = Blueprint('schemes', __name__, url_prefix='/api/schemes')
 
 # ----------------- PUBLIC SCHEME LISTING -----------------
-@schemes_bp.route('', methods=['GET'])
+@schemes_bp.route('', methods=['GET'], strict_slashes=False)
+@schemes_bp.route('/', methods=['GET'], strict_slashes=False)
 def get_schemes():
     try:
         # Only return PUBLISHED schemes to the public

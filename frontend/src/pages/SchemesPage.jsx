@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { schemeService } from '../services/api';
 import ExternalRedirectModal from '../components/ExternalRedirectModal';
+import { FALLBACK_SCHEMES } from '../data/fallbackSchemes';
 
 const SCHEME_CATEGORIES = [
   { name: 'All Categories', slug: 'all' },
@@ -53,6 +54,7 @@ const SchemesPage = () => {
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isFallback, setIsFallback] = useState(false);
 
   // Pagination
   const [page, setPage] = useState(1);
@@ -110,17 +112,43 @@ const SchemesPage = () => {
           params.search = searchQuery.trim();
         }
 
-        const res = await schemeService.getSchemes(params);
-        if (res.data.success) {
-          setSchemes(res.data.schemes);
-          setTotalCount(res.data.total);
-          setTotalPages(res.data.pages);
-        } else {
-          setError(res.data.message || 'Failed to load government schemes');
+        try {
+          const res = await schemeService.getSchemes(params);
+          if (res.data.success && res.data.schemes && res.data.schemes.length > 0) {
+            setSchemes(res.data.schemes);
+            setTotalCount(res.data.total);
+            setTotalPages(res.data.pages);
+            setIsFallback(false);
+            setLoading(false);
+            return;
+          }
+        } catch (apiErr) {
+          console.warn('Live schemes API unreachable, loading verified state cache:', apiErr);
         }
+
+        // Verified offline fallback filter
+        let filtered = [...FALLBACK_SCHEMES];
+        if (selectedCategory && selectedCategory !== 'all') {
+          filtered = filtered.filter(s => s.category_slug === selectedCategory);
+        }
+        if (selectedDept) {
+          filtered = filtered.filter(s => String(s.department_id) === String(selectedDept));
+        }
+        if (searchQuery.trim()) {
+          const q = searchQuery.toLowerCase().trim();
+          filtered = filtered.filter(s =>
+            s.name.toLowerCase().includes(q) ||
+            s.short_description.toLowerCase().includes(q) ||
+            s.beneficiary_summary.toLowerCase().includes(q)
+          );
+        }
+        setSchemes(filtered);
+        setTotalCount(filtered.length);
+        setTotalPages(1);
+        setIsFallback(true);
       } catch (err) {
-        console.error('Error fetching schemes:', err);
-        setError('Unable to reach the government schemes directory. Please try again.');
+        console.error('Error in schemes loader:', err);
+        setError('Unable to load schemes.');
       } finally {
         setLoading(false);
       }
