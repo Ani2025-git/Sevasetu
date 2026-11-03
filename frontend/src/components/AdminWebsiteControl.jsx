@@ -87,7 +87,11 @@ const AdminWebsiteControl = () => {
       }
     } catch (err) {
       console.error('Error fetching website settings:', err);
-      setError('Unable to load current website availability settings from backend.');
+      if (err.response?.status === 404) {
+        setError('Backend deployment pending: Render has not finished deploying the latest commit (7c742f6). Please trigger "Manual Deploy -> Deploy latest commit" on dashboard.render.com if auto-deploy is not enabled.');
+      } else {
+        setError('Unable to load current website availability settings from backend.');
+      }
     } finally {
       setLoading(false);
     }
@@ -151,7 +155,11 @@ const AdminWebsiteControl = () => {
       }
     } catch (err) {
       console.error('Error saving website configuration:', err);
-      setError(err.response?.data?.message || 'Failed to save website configuration.');
+      if (err.response?.status === 404) {
+        setError('Backend deployment pending: Render is still compiling the new API routes. Please trigger "Manual Deploy -> Deploy latest commit" on dashboard.render.com.');
+      } else {
+        setError(err.response?.data?.message || 'Failed to save website configuration.');
+      }
     } finally {
       setSaving(false);
     }
@@ -203,7 +211,11 @@ const AdminWebsiteControl = () => {
       }
     } catch (err) {
       console.error('Error changing website status:', err);
-      setError(err.response?.data?.message || 'Failed to change website status.');
+      if (err.response?.status === 404) {
+        setError('Backend deployment pending: Render has not yet deployed the new website-settings endpoints. Please go to dashboard.render.com and trigger "Manual Deploy -> Deploy latest commit".');
+      } else {
+        setError(err.response?.data?.message || 'Failed to change website status.');
+      }
     } finally {
       setSaving(false);
     }
@@ -755,3 +767,4 @@ const AdminWebsiteControl = () => {
 };
 
 export default AdminWebsiteControl;
+

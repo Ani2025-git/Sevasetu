@@ -81,3 +81,4 @@ class WebsiteSettings(db.Model):
             'updated_by_name': self.updater.name if self.updater else 'System Administrator',
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
+
